@@ -47,7 +47,7 @@ func (k linear) compute(i, j int) float64 {
 	return dot(k.xSpace[idx_i:], k.xSpace[idx_j:])
 }
 
-func NewLinear(x []int, xSpace []snode) linear {
+func newLinear(x []int, xSpace []snode) linear {
 	return linear{x: x, xSpace: xSpace}
 }
 
@@ -66,7 +66,7 @@ func (k rbf) compute(i, j int) float64 {
 	return math.Exp(-k.gamma * q)
 }
 
-func NewRBF(x []int, xSpace []snode, l int, gamma float64) rbf {
+func newRBF(x []int, xSpace []snode, l int, gamma float64) rbf {
 	x_square := make([]float64, l)
 
 	for i := 0; i < l; i++ {
@@ -93,7 +93,7 @@ func (k poly) compute(i, j int) float64 {
 	return math.Pow(q, float64(k.degree))
 }
 
-func NewPoly(x []int, xSpace []snode, gamma, coef0 float64, degree int) poly {
+func newPoly(x []int, xSpace []snode, gamma, coef0 float64, degree int) poly {
 	return poly{x: x, xSpace: xSpace, gamma: gamma, coef0: coef0, degree: degree}
 }
 
@@ -112,21 +112,21 @@ func (k sigmoid) compute(i, j int) float64 {
 	return math.Tanh(q)
 }
 
-func NewSigmoid(x []int, xSpace []snode, gamma, coef0 float64) sigmoid {
+func newSigmoid(x []int, xSpace []snode, gamma, coef0 float64) sigmoid {
 	return sigmoid{x: x, xSpace: xSpace, gamma: gamma, coef0: coef0}
 }
 
 /************** Factory ***************/
-func NewKernel(prob *Problem, param *Parameter) (kernelFunction, error) {
+func newKernel(prob *Problem, param *Parameter) (kernelFunction, error) {
 	switch param.KernelType {
 	case LINEAR:
-		return NewLinear(prob.x, prob.xSpace), nil
+		return newLinear(prob.x, prob.xSpace), nil
 	case POLY:
-		return NewPoly(prob.x, prob.xSpace, param.Gamma, param.Coef0, param.Degree), nil
+		return newPoly(prob.x, prob.xSpace, param.Gamma, param.Coef0, param.Degree), nil
 	case RBF:
-		return NewRBF(prob.x, prob.xSpace, prob.l, param.Gamma), nil
+		return newRBF(prob.x, prob.xSpace, prob.l, param.Gamma), nil
 	case SIGMOID:
-		return NewSigmoid(prob.x, prob.xSpace, param.Gamma, param.Coef0), nil
+		return newSigmoid(prob.x, prob.xSpace, param.Gamma, param.Coef0), nil
 	}
 	return nil, errors.New("unsupported kernel")
 }

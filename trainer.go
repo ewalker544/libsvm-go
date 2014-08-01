@@ -88,8 +88,8 @@ func solveCSVC(prob *Problem, param *Parameter, Cp, Cn float64) solution {
 		}
 	}
 
-	s := NewSolver(l, NewSVCQ(prob, param, y), minus_one, y, alpha, Cp, Cn, param.Eps, false /*not nu*/)
-	si := s.Solve() // generate solution
+	s := newSolver(l, newSVCQ(prob, param, y), minus_one, y, alpha, Cp, Cn, param.Eps, false /*not nu*/)
+	si := s.solve() // generate solution
 
 	var sum_alpha float64 = 0
 	for i := 0; i < l; i++ {
@@ -138,8 +138,8 @@ func solveNuSVC(prob *Problem, param *Parameter) solution {
 		zeros[i] = 0
 	}
 
-	s := NewSolver(l, NewSVCQ(prob, param, y), zeros, y, alpha, 1, 1, param.Eps, true /*nu*/)
-	si := s.Solve()
+	s := newSolver(l, newSVCQ(prob, param, y), zeros, y, alpha, 1, 1, param.Eps, true /*nu*/)
+	si := s.solve()
 
 	r := si.r
 	fmt.Printf("C = %v\n", 1.0/r)
@@ -179,8 +179,8 @@ func solveOneClass(prob *Problem, param *Parameter) solution {
 		ones[i] = 1
 	}
 
-	s := NewSolver(l, NewOneClassQ(prob, param), zeros, ones, alpha, 1, 1, param.Eps, false /*not nu*/)
-	si := s.Solve()
+	s := newSolver(l, newOneClassQ(prob, param), zeros, ones, alpha, 1, 1, param.Eps, false /*not nu*/)
+	si := s.solve()
 
 	return si
 }
@@ -202,8 +202,8 @@ func solveEpsilonSVR(prob *Problem, param *Parameter) solution {
 		y[i+l] = -1
 	}
 
-	s := NewSolver(2*l, NewSVRQ(prob, param), linear_term, y, alpha, param.C, param.C, param.Eps, false /*not nu*/)
-	si := s.Solve()
+	s := newSolver(2*l, newSVRQ(prob, param), linear_term, y, alpha, param.C, param.C, param.Eps, false /*not nu*/)
+	si := s.solve()
 
 	var sum_alpha float64 = 0
 	for i := 0; i < l; i++ {
@@ -241,8 +241,8 @@ func solveNuSVR(prob *Problem, param *Parameter) solution {
 		y[i+l] = -1
 	}
 
-	s := NewSolver(2*l, NewSVRQ(prob, param), linear_term, y, alpha, param.C, param.C, param.Eps, true /*nu*/)
-	si := s.Solve()
+	s := newSolver(2*l, newSVRQ(prob, param), linear_term, y, alpha, param.C, param.C, param.Eps, true /*nu*/)
+	si := s.solve()
 
 	fmt.Printf("epsilon = %f\n", -si.r)
 

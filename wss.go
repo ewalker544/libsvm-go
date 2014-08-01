@@ -5,15 +5,15 @@ import (
 )
 
 type workingSetSelecter interface {
-	workingSetSelect(solver *Solver) (int, int, int)
-	calculateRho(solver *Solver) (float64, float64)
+	workingSetSelect(solver *solver) (int, int, int)
+	calculateRho(solver *solver) (float64, float64)
 }
 
 type selectWorkingSet struct{}
 
 type selectWorkingSetNU struct{}
 
-func (s selectWorkingSet) workingSetSelect(solver *Solver) (int, int, int) {
+func (s selectWorkingSet) workingSetSelect(solver *solver) (int, int, int) {
 	var gmax float64 = -math.MaxFloat64
 	var gmax2 float64 = -math.MaxFloat64
 	var obj_diff_min float64 = math.MaxFloat64
@@ -98,7 +98,7 @@ func (s selectWorkingSet) workingSetSelect(solver *Solver) (int, int, int) {
 	return gmax_idx, gmin_idx, 0
 }
 
-func (s selectWorkingSet) calculateRho(solver *Solver) (float64, float64) {
+func (s selectWorkingSet) calculateRho(solver *solver) (float64, float64) {
 	var ub float64 = math.MaxFloat64
 	var lb float64 = -math.MaxFloat64
 	var sum_free float64 = 0
@@ -133,7 +133,7 @@ func (s selectWorkingSet) calculateRho(solver *Solver) (float64, float64) {
 	return r, 0
 }
 
-func (s selectWorkingSetNU) workingSetSelect(solver *Solver) (int, int, int) {
+func (s selectWorkingSetNU) workingSetSelect(solver *solver) (int, int, int) {
 	var gmaxp float64 = -math.MaxFloat64
 	var gmaxp2 float64 = -math.MaxFloat64
 	var gmaxp_idx int = -1
@@ -240,7 +240,7 @@ func (s selectWorkingSetNU) workingSetSelect(solver *Solver) (int, int, int) {
 	return out_i, out_j, 0
 }
 
-func (s selectWorkingSetNU) calculateRho(solver *Solver) (float64, float64) {
+func (s selectWorkingSetNU) calculateRho(solver *solver) (float64, float64) {
 	var nr_free1 int = 0
 	var nr_free2 int = 0
 	var ub1 float64 = math.MaxFloat64

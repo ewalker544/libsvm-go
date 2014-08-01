@@ -78,10 +78,16 @@ func (problem *Problem) Read(file string, param *Parameter) error { // reads the
 	return scanner.Err()
 }
 
+/**
+ * Initialize the start of iterating through the labels and vectors in the problem set
+ */
 func (problem *Problem) Begin() {
 	problem.i = 0
 }
 
+/**
+ * Finished iterating through all the labels and vectors in the problem set
+ */
 func (problem *Problem) Done() bool {
 	if problem.i >= problem.l {
 		return true
@@ -89,18 +95,30 @@ func (problem *Problem) Done() bool {
 	return false
 }
 
+/**
+ * Move to the next label and vector in the problem set
+ */
 func (problem *Problem) Next() {
 	problem.i++
 	return
 }
 
-func (problem *Problem) Get() (y float64, x map[int]float64) {
+/**
+ * Return one label and vector from the problem set
+ * @return y label
+ * @return x vector (map of dimension/value)
+ */
+func (problem *Problem) GetLine() (y float64, x map[int]float64) {
 	y = problem.y[problem.i]
 	idx := problem.x[problem.i]
 	x = SnodeToMap(problem.xSpace[idx:])
 	return // y, x
 }
 
+/**
+ * Returns number of label and vectors in the problem set
+ * @return problem set size
+ */
 func (problem *Problem) ProblemSize() int {
 	return problem.l
 }

@@ -86,7 +86,7 @@ func computeCacheSize(colSize int) int {
 	return numCols
 }
 
-func NewCache(l, colSize int) *cache {
+func newCache(l, colSize int) *cache {
 
 	colCacheSize := computeCacheSize(colSize) // number of columns we can cache
 

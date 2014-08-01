@@ -11,7 +11,7 @@ const (
 	FREE        = iota
 )
 
-type Solver struct {
+type solver struct {
 	l            int     // problem size
 	q            matrixQ // Q matrix
 	p            []float64
@@ -27,7 +27,7 @@ type Solver struct {
 	parRunner    parallelRunner
 }
 
-func (solver Solver) isUpperBound(i int) bool {
+func (solver solver) isUpperBound(i int) bool {
 	if solver.alpha_status[i] == UPPER_BOUND {
 		return true
 	} else {
@@ -35,7 +35,7 @@ func (solver Solver) isUpperBound(i int) bool {
 	}
 }
 
-func (solver Solver) isLowerBound(i int) bool {
+func (solver solver) isLowerBound(i int) bool {
 	if solver.alpha_status[i] == LOWER_BOUND {
 		return true
 	} else {
@@ -43,7 +43,7 @@ func (solver Solver) isLowerBound(i int) bool {
 	}
 }
 
-func (solver Solver) getC(i int) float64 {
+func (solver solver) getC(i int) float64 {
 	if solver.y[i] > 0 {
 		return solver.penaltyCp
 	} else {
@@ -51,7 +51,7 @@ func (solver Solver) getC(i int) float64 {
 	}
 }
 
-func (solver *Solver) updateAlphaStatus(i int) {
+func (solver *solver) updateAlphaStatus(i int) {
 	if solver.alpha[i] >= solver.getC(i) {
 		solver.alpha_status[i] = UPPER_BOUND
 	} else if solver.alpha[i] <= 0 {
@@ -61,7 +61,7 @@ func (solver *Solver) updateAlphaStatus(i int) {
 	}
 }
 
-func (solver *Solver) Solve() solution {
+func (solver *solver) solve() solution {
 
 	solver.alpha_status = make([]int8, solver.l)
 	for i := 0; i < solver.l; i++ {
@@ -221,7 +221,7 @@ func (solver *Solver) Solve() solution {
 	return si
 }
 
-func (solver *Solver) initGradientInnerLoop(Q_i []float64, alpha_i float64) {
+func (solver *solver) initGradientInnerLoop(Q_i []float64, alpha_i float64) {
 
 	run := func(start, end int) {
 		// for j := 0; j < solver.l; j++
@@ -233,12 +233,12 @@ func (solver *Solver) initGradientInnerLoop(Q_i []float64, alpha_i float64) {
 	// We CANNOT use solver.parRunner here because that has been initialized with prob.l
 	// solver.l == 2 * prob.l in the case for SVRQ
 	// Therefore we create this just once in the initialization phase of the Solve() method
-	runner := NewParallelRunner(solver.l)
+	runner := newParallelRunner(solver.l)
 	runner.run(run)
 	runner.waitAll()
 }
 
-func (solver *Solver) initGradient() {
+func (solver *solver) initGradient() {
 	run := func(start, end int) {
 		//for j := 0; j < solver.l; j++ {
 		for j := start; j < end; j++ {
@@ -251,12 +251,12 @@ func (solver *Solver) initGradient() {
 	// We CANNOT use solver.parRunner here because that has been initialized with prob.l
 	// solver.l == 2 * prob.l in the case for SVRQ
 	// Therefore we create this just once in the initialization phase of the Solve() method
-	runner := NewParallelRunner(solver.l)
+	runner := newParallelRunner(solver.l)
 	runner.run(run)
 	runner.waitAll()
 }
 
-func (solver *Solver) updateGradient(Q_i, Q_j []float64, deltaAlpha_i, deltaAlpha_j float64) {
+func (solver *solver) updateGradient(Q_i, Q_j []float64, deltaAlpha_i, deltaAlpha_j float64) {
 
 	run := func(start, end int) {
 		for k := start; k < end; k++ {
@@ -269,9 +269,9 @@ func (solver *Solver) updateGradient(Q_i, Q_j []float64, deltaAlpha_i, deltaAlph
 	solver.parRunner.waitAll() // wait for all the parallel runs to complete
 }
 
-func NewSolver(l int, q matrixQ, p []float64, y []int8, alpha []float64, penaltyCp, penaltyCn, eps float64, nu bool) Solver {
+func newSolver(l int, q matrixQ, p []float64, y []int8, alpha []float64, penaltyCp, penaltyCn, eps float64, nu bool) solver {
 
-	solver := Solver{l: l, q: q, p: p, y: y, alpha: alpha,
+	solver := solver{l: l, q: q, p: p, y: y, alpha: alpha,
 		penaltyCp: penaltyCp, penaltyCn: penaltyCn, eps: eps}
 	if nu {
 		solver.workingSet = selectWorkingSetNU{}
@@ -279,7 +279,7 @@ func NewSolver(l int, q matrixQ, p []float64, y []int8, alpha []float64, penalty
 		solver.workingSet = selectWorkingSet{}
 	}
 	solver.qd = q.getQD()
-	solver.parRunner = NewParallelRunner(solver.l)
+	solver.parRunner = newParallelRunner(solver.l)
 
 	return solver
 }

@@ -56,7 +56,7 @@ func (p parallelRunner) waitAll() {
 
 }
 
-func NewParallelRunner(n int) parallelRunner {
+func newParallelRunner(n int) parallelRunner {
 	cpus := runtime.NumCPU() // query the number of available CPUs
 	runtime.GOMAXPROCS(cpus) // set this as the number of usable CPUs
 

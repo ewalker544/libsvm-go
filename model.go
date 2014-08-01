@@ -21,6 +21,10 @@ type Model struct {
 	probB     []float64
 }
 
+func (model Model) NrClass() int {
+	return model.nrClass
+}
+
 func groupClasses(prob *Problem) (nrClass int, label []int, start []int, count []int, perm []int) {
 	var l int = prob.l
 
