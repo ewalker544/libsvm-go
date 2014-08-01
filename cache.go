@@ -1,4 +1,4 @@
-package libsvm
+package libSvm
 
 import (
 	"container/list"

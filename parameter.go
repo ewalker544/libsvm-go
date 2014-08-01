@@ -1,4 +1,4 @@
-package libsvm
+package libSvm
 
 const (
 	C_SVC       = iota
@@ -34,6 +34,8 @@ type Parameter struct {
 	Nu          float64
 	P           float64
 	Probability bool
+	CacheSize   int
+	QuietMode   bool
 }
 
 func NewParameter() *Parameter {

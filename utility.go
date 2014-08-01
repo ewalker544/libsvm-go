@@ -1,4 +1,4 @@
-package libsvm
+package libSvm
 
 import (
 	"fmt"
@@ -82,21 +82,22 @@ func SnodeToMap(x []snode) map[int]float64 {
 	return m
 }
 
-func GetModelFileName(file string) string {
+// Mostly for Debugging
+func getModelFileName(file string) string {
 	var model_file []string
 	model_file = append(model_file, file)
 	model_file = append(model_file, ".model")
 	return strings.Join(model_file, "")
 }
 
-func GetTrainFileName(file string) string {
+func getTrainFileName(file string) string {
 	var train_file []string
 	train_file = append(train_file, file)
 	train_file = append(train_file, ".train")
 	return strings.Join(train_file, "")
 }
 
-func GetTestFileName(file string) string {
+func getTestFileName(file string) string {
 	var test_file []string
 	test_file = append(test_file, file)
 	test_file = append(test_file, ".test")

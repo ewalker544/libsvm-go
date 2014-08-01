@@ -1,4 +1,4 @@
-package libsvm
+package libSvm
 
 type matrixQ interface {
 	getQ(i, l int) []float64   // Returns all the Q matrix values for column i
