@@ -67,13 +67,6 @@ func (q *weightType) Set(value string) error {
 	return nil
 }
 
-func getModelFileName(file string) string {
-	var model_file []string
-	model_file = append(model_file, file)
-	model_file = append(model_file, ".model")
-	return strings.Join(model_file, "")
-}
-
 func usage() {
 	fmt.Print(
 		"Usage: svm-train [options] training_set_file [model_file]\n",
@@ -98,13 +91,13 @@ func usage() {
 		"-p epsilon : set the epsilon in loss function of epsilon-SVR (default 0.1)\n",
 		"-m cachesize : set cache memory size in MB (default 100)\n",
 		"-e epsilon : set tolerance of termination criterion (default 0.001)\n",
-		"-b probability_estimates : whether to train a SVC or SVR model for probability estimates, true or false (default false)\n",
+		"-b : whether to train a SVC or SVR model for probability estimates, true or false (default false)\n",
 		"-w i,weight : set the parameter C of class i to weight*C, for C-SVC (default 1)\n",
 		"-v n: n-fold cross validation mode\n",
 		"-q : quiet mode (no outputs)\n")
 }
 
-func parseOptions(param *libSvm.Parameter) (trainFile string, modelFile string) {
+func parseOptions(param *libSvm.Parameter) (crossValidation int, trainFile string, modelFile string) {
 	gParam = param // set gParam to the param so we can have svmType, kernelType, and weightType update it
 
 	var svmTypeFlag svmType
@@ -122,7 +115,7 @@ func parseOptions(param *libSvm.Parameter) (trainFile string, modelFile string) 
 	flag.IntVar(&param.CacheSize, "m", 100, "")
 	flag.Float64Var(&param.Eps, "e", 0.001, "")
 	flag.Var(&weightTypeFlag, "w", "")
-	flag.BoolVar(&param.Probability, "b", false, "")
+	flag.IntVar(&crossValidation, "v", 0, "")
 	flag.BoolVar(&param.QuietMode, "q", false, "")
 
 	flag.Usage = usage
@@ -140,5 +133,12 @@ func parseOptions(param *libSvm.Parameter) (trainFile string, modelFile string) 
 		modelFile = flag.Arg(1)
 	}
 
-	return // trainFile, modelFile
+	return // crossValidation, trainFile, modelFile
+}
+
+func getModelFileName(file string) string {
+	var modelFile []string
+	modelFile = append(modelFile, file)
+	modelFile = append(modelFile, ".model")
+	return strings.Join(modelFile, "")
 }

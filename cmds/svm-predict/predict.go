@@ -7,14 +7,10 @@ import (
 )
 
 func runPrediction(prob *libSvm.Problem, param *libSvm.Parameter, model *libSvm.Model, outputFp io.Writer) {
-	var sump float64 = 0
-	var sumt float64 = 0
-	var sumpp float64 = 0
-	var sumtt float64 = 0
-	var sumpt float64 = 0
-	var correct int = 0
+
+	var squareErr libSvm.SquareError
 	var total int = 0
-	var err float64 = 0
+	var correct int = 0
 
 	for prob.Begin(); !prob.Done(); prob.Next() { // Iterate through the entire label/vector problem set
 
@@ -38,20 +34,13 @@ func runPrediction(prob *libSvm.Problem, param *libSvm.Parameter, model *libSvm.
 			correct++
 		}
 
-		err += (predictLabel - targetLabel) * (predictLabel - targetLabel)
-		sump += predictLabel
-		sumt += targetLabel
-		sumpp += predictLabel * predictLabel
-		sumtt += targetLabel * targetLabel
-		sumpt += predictLabel * targetLabel
+		squareErr.Sum(predictLabel, targetLabel)
 		total++
 	}
 
 	if param.SvmType == libSvm.NU_SVR || param.SvmType == libSvm.EPSILON_SVR {
-		fmt.Printf("Mean squared error = %g (regression)\n", float64(err)/float64(total))
-		squaredCoeff := ((float64(total)*sumpt - sump*sumt) * (float64(total)*sumpt - sump*sumt)) /
-			((float64(total)*sumpp - sump*sump) * (float64(total)*sumtt - sumt*sumt))
-		fmt.Printf("Squared correlation coefficient = %g (regression)\n", squaredCoeff)
+		fmt.Printf("Mean squared error = %g (regression)\n", squareErr.MeanSquareError())
+		fmt.Printf("Squared correlation coefficient = %g (regression)\n", squareErr.SquareCorrelationCoeff())
 	} else {
 		accuracy := float64(correct) / float64(total) * 100
 		fmt.Printf("Accuracy = %g%% (%d/%d) (classification)\n", accuracy, correct, total)

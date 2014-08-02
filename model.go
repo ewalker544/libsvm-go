@@ -325,6 +325,6 @@ func (model *Model) Train(prob *Problem) error {
 	return nil
 }
 
-func NewModel(param *Parameter) Model {
-	return Model{param: param}
+func NewModel(param *Parameter) *Model {
+	return &Model{param: param}
 }

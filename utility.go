@@ -112,9 +112,9 @@ func dumpSnode(msg string, px []snode) {
 	fmt.Println("")
 }
 
-func print_space(x []int, x_space []snode) {
+func printSpace(x []int, x_space []snode) {
 	for idx, i := range x {
-		fmt.Printf("[%d] %d: ", idx, i)
+		fmt.Printf("x[%d]=%d: ", idx, i)
 		for x_space[i].index != -1 {
 			fmt.Printf("%d:%g ", x_space[i].index, x_space[i].value)
 			i++

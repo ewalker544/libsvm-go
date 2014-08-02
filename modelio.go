@@ -74,7 +74,7 @@ func (model *Model) Dump(file string) error {
 
 	if len(model.nSV) > 0 {
 		output = append(output, "nr_sv")
-		for i := 0; i < total_models; i++ {
+		for i := 0; i < nrClass; i++ {
 			output = append(output, fmt.Sprintf(" %d", model.nSV[i]))
 		}
 		output = append(output, "\n")
@@ -113,7 +113,8 @@ func (model *Model) readHeader(scanner *bufio.Scanner) error {
 		var err error
 
 		line := scanner.Text()
-		tokens := strings.Split(line, " ")
+
+		tokens := strings.Fields(line)
 
 		switch tokens[0] {
 		case "svm_type":
@@ -230,7 +231,7 @@ func (model *Model) readHeader(scanner *bufio.Scanner) error {
 		case "nr_sv":
 
 			if model.nrClass != len(tokens)-1 {
-				return fmt.Errorf("Number of nSV %d does not appear in the file\n", model.nrClass)
+				return fmt.Errorf("Number of nSV %d does not appear in the file %v\n", model.nrClass, tokens)
 			}
 
 			model.nSV = make([]int, model.nrClass)
@@ -261,7 +262,9 @@ func (model *Model) ReadModel(file string) error {
 
 	scanner := bufio.NewScanner(f)
 
-	model.readHeader(scanner)
+	if err := model.readHeader(scanner); err != nil {
+		return err
+	}
 
 	var l int = model.l           // read l from header
 	var m int = model.nrClass - 1 // read nrClass from header
@@ -270,13 +273,21 @@ func (model *Model) ReadModel(file string) error {
 		model.svCoef[i] = make([]float64, l)
 	}
 
-	for i := 0; i < l; i++ {
-		model.sV = append(model.sV, len(model.svSpace)) // starting index into svSpace for this SV
-
-		scanner.Scan() // scan a line
+	model.sV = make([]int, l)
+	var i int = 0
+	for scanner.Scan() { // scan a line
 		line := scanner.Text()
 
 		tokens := strings.Fields(line) // get all the word tokens (seperated by white spaces)
+		if len(tokens) < 2 {           // there should be at least 2 fields -- label + SV
+			continue
+		}
+		if i >= l {
+			return fmt.Errorf("Error in reading support vectors.  i=%d and l=%d\n", i, l)
+		}
+
+		model.sV[i] = len(model.svSpace) // starting index into svSpace for this SV
+
 		var k int = 0
 		for _, token := range tokens {
 			if k < m {
@@ -299,6 +310,7 @@ func (model *Model) ReadModel(file string) error {
 			}
 		}
 		model.svSpace = append(model.svSpace, snode{index: -1})
+		i++
 	}
 
 	return nil

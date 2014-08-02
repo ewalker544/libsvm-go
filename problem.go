@@ -29,6 +29,10 @@ func (problem *Problem) Read(file string, param *Parameter) error { // reads the
 
 	defer f.Close() // close f on method return
 
+	problem.y = nil
+	problem.x = nil
+	problem.xSpace = nil
+
 	scanner := bufio.NewScanner(f)
 	var max_idx int = 0
 	var l int = 0
@@ -76,6 +80,12 @@ func (problem *Problem) Read(file string, param *Parameter) error { // reads the
 	}
 
 	return scanner.Err()
+}
+
+func NewProblem(file string, param *Parameter) (*Problem, error) {
+	prob := &Problem{l: 0, i: 0}
+	err := prob.Read(file, param)
+	return prob, err
 }
 
 /**
