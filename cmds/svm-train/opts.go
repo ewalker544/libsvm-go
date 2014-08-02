@@ -97,7 +97,7 @@ func usage() {
 		"-q : quiet mode (no outputs)\n")
 }
 
-func parseOptions(param *libSvm.Parameter) (crossValidation int, trainFile string, modelFile string) {
+func parseOptions(param *libSvm.Parameter) (nrFold int, trainFile string, modelFile string) {
 	gParam = param // set gParam to the param so we can have svmType, kernelType, and weightType update it
 
 	var svmTypeFlag svmType
@@ -115,7 +115,7 @@ func parseOptions(param *libSvm.Parameter) (crossValidation int, trainFile strin
 	flag.IntVar(&param.CacheSize, "m", 100, "")
 	flag.Float64Var(&param.Eps, "e", 0.001, "")
 	flag.Var(&weightTypeFlag, "w", "")
-	flag.IntVar(&crossValidation, "v", 0, "")
+	flag.IntVar(&nrFold, "v", 0, "")
 	flag.BoolVar(&param.QuietMode, "q", false, "")
 
 	flag.Usage = usage

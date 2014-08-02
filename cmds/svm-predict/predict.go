@@ -8,7 +8,7 @@ import (
 
 func runPrediction(prob *libSvm.Problem, param *libSvm.Parameter, model *libSvm.Model, outputFp io.Writer) {
 
-	var squareErr libSvm.SquareError
+	squareErr := libSvm.NewSquareErrorComputer()
 	var total int = 0
 	var correct int = 0
 

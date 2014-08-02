@@ -3,6 +3,7 @@ package libSvm
 import (
 	"fmt"
 	"math/rand"
+	"time"
 )
 
 /**
@@ -26,13 +27,13 @@ func CrossValidation(prob *Problem, param *Parameter, nrFold int) (target []floa
 	foldStart := make([]int, nrFold+1)
 
 	perm := make([]int, l)
-
+	random := rand.New(rand.NewSource(time.Now().UTC().UnixNano()))
 	// stratified cv may not give leave-one-out rate
 	// Each class to l folds -> some folds may have zero elements
 	if (param.SvmType == C_SVC || param.SvmType == NU_SVC) && nrFold < l {
 
-		nrClass, _, start, count, perm := groupClasses(prob) // group SV with the same labels together
-
+		nrClass, _, start, count, localPerm := groupClasses(prob) // group SV with the same labels together
+		perm = localPerm
 		// random shuffle and then data grouped by fold using the array perm
 		foldCount := make([]int, nrFold)
 		index := make([]int, l)
@@ -42,7 +43,7 @@ func CrossValidation(prob *Problem, param *Parameter, nrFold int) (target []floa
 
 		for c := 0; c < nrClass; c++ {
 			for i := 0; i < count[c]; i++ {
-				j := i + rand.Intn(count[c]-i)
+				j := i + random.Intn(count[c]-i)
 				index[start[c]+j], index[start[c]+i] = index[start[c]+i], index[start[c]+j]
 			}
 		}
@@ -96,6 +97,7 @@ func CrossValidation(prob *Problem, param *Parameter, nrFold int) (target []floa
 
 		var subProb Problem
 
+		subProb.xSpace = prob.xSpace // inherit problem space
 		subProb.l = l - (end - begin)
 		subProb.x = make([]int, subProb.l)
 		subProb.y = make([]float64, subProb.l)

@@ -11,7 +11,7 @@ func doCrossValidation(prob *libSvm.Problem, param *libSvm.Parameter, nrFold int
 
 	if param.SvmType == libSvm.EPSILON_SVR || param.SvmType == libSvm.NU_SVR {
 
-		var squareErr libSvm.SquareError
+		squareErr := libSvm.NewSquareErrorComputer()
 
 		var i int = 0
 		for prob.Begin(); !prob.Done(); prob.Next() {
