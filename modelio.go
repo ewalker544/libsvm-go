@@ -13,6 +13,7 @@
 ** See the License for the specific language governing permissions and
 ** limitations under the License.
 **
+** Description: Input/output routines for the Support Vector Machine model
 ** @author: Ed Walker
  */
 package libSvm

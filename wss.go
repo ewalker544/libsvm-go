@@ -13,6 +13,8 @@
 ** See the License for the specific language governing permissions and
 ** limitations under the License.
 **
+** Description: Working-set selection
+** Ref: R.-E. Fan, P.-H. Chen, and C.-J. Lin. "Working set selection using second order information for training SVM". Journal of Machine Learning Research 6 (2005)
 ** @author: Ed Walker
  */
 package libSvm

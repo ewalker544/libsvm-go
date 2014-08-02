@@ -13,6 +13,7 @@
 ** See the License for the specific language governing permissions and
 ** limitations under the License.
 **
+** Description: Useful functions used in various parts of the library
 ** @author: Ed Walker
  */
 package libSvm

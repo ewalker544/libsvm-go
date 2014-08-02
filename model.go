@@ -13,6 +13,7 @@
 ** See the License for the specific language governing permissions and
 ** limitations under the License.
 **
+** Description: Model describes the properties of the Support Vector Machine after training.
 ** @author: Ed Walker
  */
 package libSvm

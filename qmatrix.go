@@ -13,6 +13,8 @@
 ** See the License for the specific language governing permissions and
 ** limitations under the License.
 **
+** Description: Q matrix for Support Vector Classification (svcQ), Support Vector Regression  (svrQ),
+**              and One-Class Support Vector Machines (oneClassQ)
 ** @author: Ed Walker
  */
 package libSvm

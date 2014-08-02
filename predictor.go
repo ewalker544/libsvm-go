@@ -13,11 +13,10 @@
 ** See the License for the specific language governing permissions and
 ** limitations under the License.
 **
+** Description: Prediciton related APIs
 ** @author: Ed Walker
  */
 package libSvm
-
-// import "fmt" // DEBUG
 
 /**
 *  This function gives decision values on a test vector x given a

@@ -13,6 +13,8 @@
 ** See the License for the specific language governing permissions and
 ** limitations under the License.
 **
+** Description: Sequential Minimal Optimization (SMO) solver
+** Ref: C.-C. Chang, C.-J. Lin. "LIBSVM: A library for support vector machines". ACM Transactions on Intelligent Systems and Technology 2 (2011)
 ** @author: Ed Walker
  */
 package libSvm

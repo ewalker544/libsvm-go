@@ -13,6 +13,7 @@
 ** See the License for the specific language governing permissions and
 ** limitations under the License.
 **
+** Description: Describes the parameters of the Supper Vector Machine solver
 ** @author: Ed Walker
  */
 package libSvm

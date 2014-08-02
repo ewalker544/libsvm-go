@@ -13,6 +13,7 @@
 ** See the License for the specific language governing permissions and
 ** limitations under the License.
 **
+** Description: Caches Q matrix columns.  The cache implements a LRU (Last Recently Used) eviction policy.
 ** @author: Ed Walker
  */
 package libSvm
@@ -60,7 +61,7 @@ func (c *cache) getData(i int) ([]float64, bool) {
 		if c.cacheAvail == 0 { // no more space in cache
 			// free a column
 
-			//Remove the front of the LRU list (the least used)
+			//Remove the front of the LRU list (the last used)
 			oldElement := c.cacheList.Front()
 			value := c.cacheList.Remove(oldElement)
 			old := value.(*cacheNode)

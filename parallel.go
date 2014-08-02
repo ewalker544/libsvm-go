@@ -13,6 +13,7 @@
 ** See the License for the specific language governing permissions and
 ** limitations under the License.
 **
+** Description: Useful types/methods for running loops in parallel.
 ** @author: Ed Walker
  */
 package libSvm
