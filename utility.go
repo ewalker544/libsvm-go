@@ -18,6 +18,7 @@
 package libSvm
 
 import (
+	"bufio"
 	"fmt"
 	"os"
 	"sort"
@@ -97,6 +98,24 @@ func SnodeToMap(x []snode) map[int]float64 {
 	}
 
 	return m
+}
+
+/**
+ * Reads a complete line with bufio.Reader and returns it as a string
+ * Attribution: http://stackoverflow.com/questions/8757389/reading-file-line-by-line-in-go
+ * Thank you Malcolm!
+ */
+func readline(r *bufio.Reader) (string, error) {
+	var (
+		isPrefix bool  = true
+		err      error = nil
+		line, ln []byte
+	)
+	for isPrefix && err == nil {
+		line, isPrefix, err = r.ReadLine()
+		ln = append(ln, line...)
+	}
+	return string(ln), err
 }
 
 // Mostly for Debugging

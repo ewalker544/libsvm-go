@@ -50,14 +50,19 @@ func (problem *Problem) Read(file string, param *Parameter) error { // reads the
 	problem.x = nil
 	problem.xSpace = nil
 
-	scanner := bufio.NewScanner(f)
+	reader := bufio.NewReader(f)
 	var max_idx int = 0
 	var l int = 0
-	//var j int = 0
-	for scanner.Scan() {
+
+	for {
+		line, err := readline(reader)
+		if err != nil {
+			break
+		}
 		problem.x = append(problem.x, len(problem.xSpace))
-		line := scanner.Text()
-		lineSansComments := strings.Split(line, "#")  // remove any comments
+
+		lineSansComments := strings.Split(line, "#") // remove any comments
+
 		tokens := strings.Fields(lineSansComments[0]) // get all the word tokens (seperated by white spaces)
 		if label, err := strconv.ParseFloat(tokens[0], 64); err == nil {
 			problem.y = append(problem.y, label)
@@ -96,7 +101,7 @@ func (problem *Problem) Read(file string, param *Parameter) error { // reads the
 		param.Gamma = 1.0 / float64(max_idx)
 	}
 
-	return scanner.Err()
+	return nil
 }
 
 func NewProblem(file string, param *Parameter) (*Problem, error) {

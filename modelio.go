@@ -123,13 +123,17 @@ func (model *Model) Dump(file string) error {
 	return nil
 }
 
-func (model *Model) readHeader(scanner *bufio.Scanner) error {
+func (model *Model) readHeader(reader *bufio.Reader) error {
 
-	for scanner.Scan() {
+	for {
 		var i int = 0
 		var err error
+		var line string
 
-		line := scanner.Text()
+		line, err = readline(reader)
+		if err != nil { // We should not encounter an EOF.  If we do, it is an error.
+			return err
+		}
 
 		tokens := strings.Fields(line)
 
@@ -277,9 +281,9 @@ func (model *Model) ReadModel(file string) error {
 
 	defer f.Close() // close f on method return
 
-	scanner := bufio.NewScanner(f)
+	reader := bufio.NewReader(f)
 
-	if err := model.readHeader(scanner); err != nil {
+	if err := model.readHeader(reader); err != nil {
 		return err
 	}
 
@@ -292,8 +296,11 @@ func (model *Model) ReadModel(file string) error {
 
 	model.sV = make([]int, l)
 	var i int = 0
-	for scanner.Scan() { // scan a line
-		line := scanner.Text()
+	for {
+		line, err := readline(reader) // read a line
+		if err != nil {
+			break
+		}
 
 		tokens := strings.Fields(line) // get all the word tokens (seperated by white spaces)
 		if len(tokens) < 2 {           // there should be at least 2 fields -- label + SV
