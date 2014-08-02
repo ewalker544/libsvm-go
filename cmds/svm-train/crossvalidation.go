@@ -22,7 +22,6 @@ func doCrossValidation(prob *libSvm.Problem, param *libSvm.Parameter, nrFold int
 		}
 
 		fmt.Printf("Cross Validation Mean squared error = %g\n", squareErr.MeanSquareError())
-
 		fmt.Printf("Cross Validation Squared correlation coefficient = %g\n", squareErr.SquareCorrelationCoeff())
 	} else {
 		var i int = 0
