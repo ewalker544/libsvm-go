@@ -94,19 +94,18 @@ func (c cache) stats() {
 	fmt.Printf("Cache efficiency: %.6f%%\n", float32(c.hits)/float32(c.hits+c.misses)*100)
 }
 
-func computeCacheSize(colSize int) int {
-	var cacheSize int = 500 // MB (default)
+func computeCacheSize(colSize, cacheSize int) int {
 
-	cacheSizeBytes := cacheSize * (1 << 20)
+	cacheSizeBytes := cacheSize * (1 << 20)               // multiply by 1 Mbytes
 	numCols := cacheSizeBytes / (colSize * sizeOfFloat64) // num of columns we can store
 	numCols = maxi(2, numCols)                            // we should be able to store at least 2
 
 	return numCols
 }
 
-func newCache(l, colSize int) *cache {
+func newCache(l, colSize, cacheSize int) *cache {
 
-	colCacheSize := computeCacheSize(colSize) // number of columns we can cache
+	colCacheSize := computeCacheSize(colSize, cacheSize) // number of columns we can cache
 
 	head := make([]cacheNode, l)
 	for i := 0; i < l; i++ {

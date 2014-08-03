@@ -90,7 +90,7 @@ func newSVCQ(prob *Problem, param *Parameter, y []int8) *svcQ {
 		qd[i] = kernel.compute(i, i)
 	}
 
-	return &svcQ{y: y, qd: qd, kernel: kernel, parRunner: newParallelRunner(prob.l), colCache: newCache(prob.l, prob.l)}
+	return &svcQ{y: y, qd: qd, kernel: kernel, parRunner: newParallelRunner(prob.l), colCache: newCache(prob.l, prob.l, param.CacheSize)}
 }
 
 /**
@@ -162,7 +162,7 @@ func newOneClassQ(prob *Problem, param *Parameter) *oneClassQ {
 		qd[i] = kernel.compute(i, i)
 	}
 
-	return &oneClassQ{qd: qd, kernel: kernel, parRunner: newParallelRunner(prob.l), colCache: newCache(prob.l, prob.l)}
+	return &oneClassQ{qd: qd, kernel: kernel, parRunner: newParallelRunner(prob.l), colCache: newCache(prob.l, prob.l, param.CacheSize)}
 }
 
 /**
@@ -263,5 +263,5 @@ func newSVRQ(prob *Problem, param *Parameter) *svrQ {
 		qd[i+l] = qd[i]
 	}
 
-	return &svrQ{l: l, qd: qd, kernel: kernel, parRunner: newParallelRunner(prob.l), colCache: newCache(prob.l, 2*prob.l)}
+	return &svrQ{l: l, qd: qd, kernel: kernel, parRunner: newParallelRunner(prob.l), colCache: newCache(prob.l, 2*prob.l, param.CacheSize)}
 }

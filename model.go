@@ -39,6 +39,10 @@ type Model struct {
 	probB     []float64
 }
 
+func NewModel(param *Parameter) *Model {
+	return &Model{param: param}
+}
+
 func (model Model) NrClass() int {
 	return model.nrClass
 }
@@ -341,8 +345,4 @@ func (model *Model) Train(prob *Problem) error {
 		model.regressionOneClass(prob)
 	}
 	return nil
-}
-
-func NewModel(param *Parameter) *Model {
-	return &Model{param: param}
 }

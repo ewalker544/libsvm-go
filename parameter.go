@@ -38,11 +38,11 @@ var svm_type_string = []string{"c_svc", "nu_svc", "one_class", "epsilon_svr", "n
 var kernel_type_string = []string{"linear", "polynomial", "rbf", "sigmoid", "precomputed"}
 
 type Parameter struct {
-	SvmType    int
-	KernelType int
-	Degree     int
-	Gamma      float64
-	Coef0      float64
+	SvmType    int     // Support vector type
+	KernelType int     // Kernel type
+	Degree     int     // Degree used in polynomial kernel
+	Gamma      float64 // Gamma used in rbf, polynomial, and sigmoid kernel
+	Coef0      float64 // Coef0 used in polynomial and sigmoid kernel
 
 	Eps         float64 // stopping criteria
 	C           float64 // penality
@@ -51,12 +51,12 @@ type Parameter struct {
 	Weight      []float64
 	Nu          float64
 	P           float64
-	Probability bool
-	CacheSize   int
-	QuietMode   bool
+	Probability bool // Should probability estimation be performed?
+	CacheSize   int  // Size of Q matrix cache
+	QuietMode   bool // quiet mode
 }
 
 func NewParameter() *Parameter {
 	return &Parameter{SvmType: C_SVC, KernelType: RBF, Degree: 3, Gamma: 0, Coef0: 0, Nu: 0.5, C: 1, Eps: 1e-3, P: 0.1,
-		NrWeight: 0, Probability: false}
+		NrWeight: 0, Probability: false, CacheSize: 100, QuietMode: false}
 }

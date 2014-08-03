@@ -39,6 +39,12 @@ type Problem struct {
 	i      int       // counter for iterator
 }
 
+func NewProblem(file string, param *Parameter) (*Problem, error) {
+	prob := &Problem{l: 0, i: 0}
+	err := prob.Read(file, param)
+	return prob, err
+}
+
 func (problem *Problem) Read(file string, param *Parameter) error { // reads the problem from the specified file
 	f, err := os.Open(file)
 	if err != nil {
@@ -103,12 +109,6 @@ func (problem *Problem) Read(file string, param *Parameter) error { // reads the
 	}
 
 	return nil
-}
-
-func NewProblem(file string, param *Parameter) (*Problem, error) {
-	prob := &Problem{l: 0, i: 0}
-	err := prob.Read(file, param)
-	return prob, err
 }
 
 /**

@@ -32,9 +32,9 @@ import (
    For a classification model with probability information, this
    function gives nrClass probability estimates in the array
    probabilityEstimate. nrClass can be obtained from the model.
-   The class with the highest probability is returned.
-   For regression/one-class SVM, the array probabilityEsstimate
-   is nil and the returned value is the same as that of Predict.
+   The class with the highest probability is returned in returnValue.
+   For regression/one-class SVM, probabilityEsstimate is nil,
+   and returnValue is the same as that of Predict.
 
 */
 func (model Model) PredictProbability(x map[int]float64) (returnValue float64, probabilityEstimate []float64) {
