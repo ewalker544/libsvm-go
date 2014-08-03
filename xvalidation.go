@@ -61,6 +61,7 @@ func CrossValidation(prob *Problem, param *Parameter, nrFold int) (target []floa
 		for c := 0; c < nrClass; c++ {
 			for i := 0; i < count[c]; i++ {
 				j := i + random.Intn(count[c]-i)
+				//j := i + randIntn(count[c]-i)
 				index[start[c]+j], index[start[c]+i] = index[start[c]+i], index[start[c]+j]
 			}
 		}
@@ -99,7 +100,7 @@ func CrossValidation(prob *Problem, param *Parameter, nrFold int) (target []floa
 		}
 
 		for i := 0; i < l; i++ {
-			j := i + rand.Intn(l-i)
+			j := i + random.Intn(l-i)
 			perm[i], perm[j] = perm[j], perm[i]
 		}
 

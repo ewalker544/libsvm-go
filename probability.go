@@ -171,6 +171,7 @@ func binarySvcProbability(prob *Problem, param *Parameter, Cp, Cn float64) (prob
 	random := rand.New(rand.NewSource(time.Now().UTC().UnixNano()))
 	for i := 0; i < prob.l; i++ {
 		j := i + random.Intn(prob.l-i)
+		//j := i + randIntn(prob.l-i) // DEBUG
 		perm[i], perm[j] = perm[j], perm[i]
 	}
 
