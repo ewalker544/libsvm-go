@@ -29,8 +29,7 @@ import (
    nrFold folds. Under given parameters, sequentially each fold is
    validated using the model from training the remaining. Predicted
    labels (of all prob's instances) in the validation process are
-   stored in the array called target.
-
+   stored in the slice called target.
 */
 func CrossValidation(prob *Problem, param *Parameter, nrFold int) (target []float64) {
 	var l int = prob.l

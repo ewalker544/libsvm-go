@@ -24,19 +24,17 @@ package libSvm
    the function value (regression).
 
    For a classification model with nrClass classes, this function
-   gives nrClass*(nrClass-1)/2 decision values in the array
-   decisionValues, where nrClass can be obtained from the model.
-   The order is label[0] vs. label[1], ...,
+   gives nrClass*(nrClass-1)/2 decision values in the slice
+   decisionValues.  The order is label[0] vs. label[1], ...,
    label[0] vs. label[nr_class-1], label[1] vs. label[2], ...,
-   label[nrClass-2] vs. label[nrClass-1], where label can be
-   obtained from the model. The returned value is
+   label[nrClass-2] vs. label[nrClass-1]. The returned returnValue is
    the predicted class for x. Note that when nrClass = 1, this
    function does not give any decision value.
 
-   For a regression model, decisionValues[0] and the returned value are
+   For a regression model, decisionValues[0] and the returned returnValue are
    both the function value of x calculated using the model. For a
    one-class model, decisionValues[0] is the decision value of x, while
-   the returned value is +1/-1.
+   the returned returnValue is +1/-1.
 
 */
 func (model Model) PredictValues(x map[int]float64) (returnValue float64, decisionValues []float64) {
@@ -79,13 +77,6 @@ func (model Model) PredictValues(x map[int]float64) (returnValue float64, decisi
 			var idx_y int = model.sV[i]
 			py := model.svSpace[idx_y:]
 			kvalue[i] = computeKernelValue(px, py, model.param)
-			/*
-				if i < 3 { // DEBUG
-					dumpSnode("px: ", px)
-					dumpSnode("py: ", py)
-					fmt.Printf("kvalue[%d]=%f\n", i, kvalue[i])
-				}
-			*/
 		}
 
 		start := make([]int, nrClass)

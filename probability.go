@@ -30,10 +30,9 @@ import (
    given a model with probability information.
 
    For a classification model with probability information, this
-   function gives nrClass probability estimates in the array
-   probabilityEstimate. nrClass can be obtained from the model.
-   The class with the highest probability is returned in returnValue.
-   For regression/one-class SVM, probabilityEsstimate is nil,
+   function gives nrClass probability estimates in the slice
+   probabilityEstimate. The class with the highest probability is returned
+   in returnValue. For regression/one-class SVM, probabilityEsstimate is nil,
    and returnValue is the same as that of Predict.
 
 */
