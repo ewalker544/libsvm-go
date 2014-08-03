@@ -22,6 +22,7 @@ import (
 	"fmt"
 	"math"
 	"math/rand"
+	"time"
 )
 
 /**
@@ -167,8 +168,10 @@ func binarySvcProbability(prob *Problem, param *Parameter, Cp, Cn float64) (prob
 	for i := 0; i < prob.l; i++ {
 		perm[i] = i
 	}
+
+	random := rand.New(rand.NewSource(time.Now().UTC().UnixNano()))
 	for i := 0; i < prob.l; i++ {
-		j := i + rand.Intn(prob.l-i)
+		j := i + random.Intn(prob.l-i)
 		perm[i], perm[j] = perm[j], perm[i]
 	}
 
