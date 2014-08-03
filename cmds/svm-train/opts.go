@@ -133,6 +133,7 @@ func parseOptions(param *libSvm.Parameter) (nrFold int, trainFile string, modelF
 	flag.Float64Var(&param.Eps, "e", 0.001, "")
 	flag.Var(&weightTypeFlag, "w", "")
 	flag.IntVar(&nrFold, "v", 0, "")
+	flag.BoolVar(&param.Probability, "b", false, "")
 	flag.BoolVar(&param.QuietMode, "q", false, "")
 
 	flag.Usage = usage

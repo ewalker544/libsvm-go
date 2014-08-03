@@ -177,7 +177,7 @@ func binarySvcProbability(prob *Problem, param *Parameter, Cp, Cn float64) (prob
 		end := (i + 1) * prob.l / nrFold
 
 		var subProb Problem
-
+		subProb.xSpace = prob.xSpace
 		subProb.l = prob.l - (end - begin)
 		subProb.x = make([]int, subProb.l)
 		subProb.y = make([]float64, subProb.l)

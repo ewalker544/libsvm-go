@@ -13,7 +13,7 @@
 ** See the License for the specific language governing permissions and
 ** limitations under the License.
 **
-** Description: Training related APIs
+** Description: Functions for calling the solver for different problem scenerios, i.e. SVC, SVR, or One-Class
 ** @author: Ed Walker
  */
 package libSvm
