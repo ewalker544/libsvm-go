@@ -167,3 +167,14 @@ func dump(g []float64) {
 	}
 	os.Exit(0)
 }
+
+/**
+ * simple predictable random number generator in rang
+ */
+var nSeedi int = 1
+
+func randIntn(rang int) int {
+	nSeedi = (7 * nSeedi) % 11
+	p := float64(nSeedi) / 11.0
+	return int(p * float64(rang))
+}
