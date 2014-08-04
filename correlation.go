@@ -13,7 +13,7 @@
 ** See the License for the specific language governing permissions and
 ** limitations under the License.
 **
-** Description: the mean square error, and the square correlation coefficient
+** Description: Calculate the mean square error, and the square correlation coefficient
 ** @author: Ed Walker
  */
 
