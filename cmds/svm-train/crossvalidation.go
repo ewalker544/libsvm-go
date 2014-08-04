@@ -38,8 +38,8 @@ func doCrossValidation(prob *libSvm.Problem, param *libSvm.Parameter, nrFold int
 			i++
 		}
 
-		fmt.Printf("Cross Validation Mean squared error = %.6g\n", squareErr.MeanSquareError())
-		fmt.Printf("Cross Validation Squared correlation coefficient = %.6g\n", squareErr.SquareCorrelationCoeff())
+		fmt.Fprintf(outFP, "Cross Validation Mean squared error = %.6g\n", squareErr.MeanSquareError())
+		fmt.Fprintf(outFP, "Cross Validation Squared correlation coefficient = %.6g\n", squareErr.SquareCorrelationCoeff())
 	} else {
 		var i int = 0
 		var correct int = 0
@@ -50,7 +50,7 @@ func doCrossValidation(prob *libSvm.Problem, param *libSvm.Parameter, nrFold int
 			}
 			i++
 		}
-		fmt.Printf("Cross Validation Accuracy = %.6g%%\n", 100*float64(correct)/float64(prob.ProblemSize()))
+		fmt.Fprintf(outFP, "Cross Validation Accuracy = %.6g%%\n", 100*float64(correct)/float64(prob.ProblemSize()))
 
 	}
 }

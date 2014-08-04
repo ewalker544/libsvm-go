@@ -21,21 +21,50 @@ import (
 	"flag"
 	"fmt"
 	"github.com/ewalker544/libsvm-go"
+	"io"
+	"io/ioutil"
 	"os"
+	"strconv"
 	"strings"
 )
+
+var outFP io.Writer = os.Stdout
+var gParam *libSvm.Parameter
+
+type probabilityType int
+
+func (q *probabilityType) String() string {
+	return ("Probability Type")
+}
+
+func (q *probabilityType) Set(value string) error {
+	val, err := strconv.Atoi(value)
+	if err != nil || val < 0 || val > 1 {
+		return fmt.Errorf("Invalid probability value (-b %d)\n", val)
+	}
+	if val == 0 {
+		gParam.Probability = false
+	} else {
+		gParam.Probability = true
+	}
+	return nil
+}
 
 func usage() {
 	fmt.Print(
 		"Usage: svm-predict [options] test_file model_file [output_file]\n",
 		"options:\n",
-		"-b : whether to predict probability estimates, true or false (default false); for one-class SVM only false is supported\n",
+		"-b probability_estimates: whether to predict probability estimates, 0 or 1 (default 0); for one-class SVM only 0 is supported\n",
 		"-q : quiet mode (no outputs)\n")
 }
 
 func parseOptions(param *libSvm.Parameter) (testFile string, modelFile string, outputFile string) {
 
-	flag.BoolVar(&param.Probability, "b", false, "")
+	gParam = param
+
+	var probabilityTypeFlag probabilityType
+
+	flag.Var(&probabilityTypeFlag, "b", "")
 	flag.BoolVar(&param.QuietMode, "q", false, "")
 
 	flag.Usage = usage
@@ -53,6 +82,10 @@ func parseOptions(param *libSvm.Parameter) (testFile string, modelFile string, o
 		testFile = flag.Arg(0)
 		modelFile = flag.Arg(1)
 		outputFile = flag.Arg(2)
+	}
+
+	if param.QuietMode {
+		outFP = ioutil.Discard
 	}
 
 	return // testFile, modelFile, outputFile

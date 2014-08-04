@@ -64,7 +64,9 @@ func train_one(prob *Problem, param *Parameter, Cp, Cn float64) (decision, error
 		return decision{}, &trainError{val: param.SvmType, msg: "svm type not supported"}
 	}
 
-	fmt.Printf("obj = %f, rho = %f\n", si.obj, si.rho)
+	if !param.QuietMode {
+		fmt.Printf("obj = %f, rho = %f\n", si.obj, si.rho)
+	}
 	alpha := si.alpha
 
 	var nSV int = 0
@@ -84,7 +86,9 @@ func train_one(prob *Problem, param *Parameter, Cp, Cn float64) (decision, error
 		}
 	}
 
-	fmt.Printf("nSV = %d, nBSV = %d\n", nSV, nBSV)
+	if !param.QuietMode {
+		fmt.Printf("nSV = %d, nBSV = %d\n", nSV, nBSV)
+	}
 
 	return decision{alpha: alpha, rho: si.rho}, nil
 }
@@ -106,7 +110,7 @@ func solveCSVC(prob *Problem, param *Parameter, Cp, Cn float64) solution {
 		}
 	}
 
-	s := newSolver(l, newSVCQ(prob, param, y), minus_one, y, alpha, Cp, Cn, param.Eps, false /*not nu*/)
+	s := newSolver(l, newSVCQ(prob, param, y), minus_one, y, alpha, Cp, Cn, param.Eps, false /*not nu*/, param.QuietMode)
 	si := s.solve() // generate solution
 
 	var sum_alpha float64 = 0
@@ -116,8 +120,10 @@ func solveCSVC(prob *Problem, param *Parameter, Cp, Cn float64) solution {
 	}
 
 	if Cp == Cn {
-		t := Cp * float64(l)
-		fmt.Printf("nu = %f\n", sum_alpha/t)
+		if !param.QuietMode {
+			t := Cp * float64(l)
+			fmt.Printf("nu = %f\n", sum_alpha/t)
+		}
 	}
 
 	return si // return solution
@@ -156,11 +162,13 @@ func solveNuSVC(prob *Problem, param *Parameter) solution {
 		zeros[i] = 0
 	}
 
-	s := newSolver(l, newSVCQ(prob, param, y), zeros, y, alpha, 1, 1, param.Eps, true /*nu*/)
+	s := newSolver(l, newSVCQ(prob, param, y), zeros, y, alpha, 1, 1, param.Eps, true /*nu*/, param.QuietMode)
 	si := s.solve()
 
 	r := si.r
-	fmt.Printf("C = %v\n", 1.0/r)
+	if !param.QuietMode {
+		fmt.Printf("C = %v\n", 1.0/r)
+	}
 
 	for i := 0; i < l; i++ {
 		si.alpha[i] *= (float64(y[i]) / r)
@@ -197,7 +205,7 @@ func solveOneClass(prob *Problem, param *Parameter) solution {
 		ones[i] = 1
 	}
 
-	s := newSolver(l, newOneClassQ(prob, param), zeros, ones, alpha, 1, 1, param.Eps, false /*not nu*/)
+	s := newSolver(l, newOneClassQ(prob, param), zeros, ones, alpha, 1, 1, param.Eps, false /*not nu*/, param.QuietMode)
 	si := s.solve()
 
 	return si
@@ -220,7 +228,7 @@ func solveEpsilonSVR(prob *Problem, param *Parameter) solution {
 		y[i+l] = -1
 	}
 
-	s := newSolver(2*l, newSVRQ(prob, param), linear_term, y, alpha, param.C, param.C, param.Eps, false /*not nu*/)
+	s := newSolver(2*l, newSVRQ(prob, param), linear_term, y, alpha, param.C, param.C, param.Eps, false /*not nu*/, param.QuietMode)
 	si := s.solve()
 
 	var sum_alpha float64 = 0
@@ -231,7 +239,9 @@ func solveEpsilonSVR(prob *Problem, param *Parameter) solution {
 	si.alpha = si.alpha[:l]
 
 	var nu float64 = sum_alpha / (param.C * float64(l))
-	fmt.Printf("nu = %v\n", nu)
+	if !param.QuietMode {
+		fmt.Printf("nu = %v\n", nu)
+	}
 
 	return si
 }
@@ -259,10 +269,12 @@ func solveNuSVR(prob *Problem, param *Parameter) solution {
 		y[i+l] = -1
 	}
 
-	s := newSolver(2*l, newSVRQ(prob, param), linear_term, y, alpha, param.C, param.C, param.Eps, true /*nu*/)
+	s := newSolver(2*l, newSVRQ(prob, param), linear_term, y, alpha, param.C, param.C, param.Eps, true /*nu*/, param.QuietMode)
 	si := s.solve()
 
-	fmt.Printf("epsilon = %f\n", -si.r)
+	if !param.QuietMode {
+		fmt.Printf("epsilon = %f\n", -si.r)
+	}
 
 	for i := 0; i < l; i++ {
 		si.alpha[i] = si.alpha[i] - si.alpha[i+l]

@@ -194,7 +194,7 @@ func (model *Model) classification(prob *Problem) {
 				}
 
 			} else {
-				fmt.Println("WARNING: training failed: ", err)
+				fmt.Fprintln(os.Stderr, "WARNING: training failed: ", err)
 				return // no point in continuing
 			}
 
@@ -234,7 +234,9 @@ func (model *Model) classification(prob *Problem) {
 		nz_count[i] = nSV
 	}
 
-	fmt.Printf("Total nSV = %d\n", totalSV)
+	if !model.param.QuietMode {
+		fmt.Printf("Total nSV = %d\n", totalSV)
+	}
 
 	model.l = totalSV
 	model.svSpace = prob.xSpace
@@ -333,7 +335,7 @@ func (model *Model) regressionOneClass(prob *Problem) {
 			}
 		}
 	} else {
-		fmt.Println("WARNING: training failed: ", err)
+		fmt.Fprintln(os.Stderr, "WARNING: training failed: ", err)
 	}
 }
 

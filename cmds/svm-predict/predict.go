@@ -56,10 +56,10 @@ func runPrediction(prob *libSvm.Problem, param *libSvm.Parameter, model *libSvm.
 	}
 
 	if param.SvmType == libSvm.NU_SVR || param.SvmType == libSvm.EPSILON_SVR {
-		fmt.Printf("Mean squared error = %.6g (regression)\n", squareErr.MeanSquareError())
-		fmt.Printf("Squared correlation coefficient = %.6g (regression)\n", squareErr.SquareCorrelationCoeff())
+		fmt.Fprintf(outFP, "Mean squared error = %.6g (regression)\n", squareErr.MeanSquareError())
+		fmt.Fprintf(outFP, "Squared correlation coefficient = %.6g (regression)\n", squareErr.SquareCorrelationCoeff())
 	} else {
 		accuracy := float64(correct) / float64(total) * 100
-		fmt.Printf("Accuracy = %.6g%% (%d/%d) (classification)\n", accuracy, correct, total)
+		fmt.Fprintf(outFP, "Accuracy = %.6g%% (%d/%d) (classification)\n", accuracy, correct, total)
 	}
 }

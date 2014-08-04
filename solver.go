@@ -44,6 +44,7 @@ type solver struct {
 	eps          float64
 	workingSet   workingSetSelecter
 	parRunner    parallelRunner
+	quietMode    bool
 }
 
 func (solver solver) isUpperBound(i int) bool {
@@ -116,14 +117,18 @@ func (solver *solver) solve() solution {
 	for iter < max_iter {
 		if counter = counter - 1; counter == 0 {
 			counter = mini(solver.l, 1000)
-			fmt.Print(".")
+			if !solver.quietMode {
+				fmt.Print(".")
+			}
 		}
 
 		var i int = 0
 		var j int = 0
 		var rc int = 0
 		if i, j, rc = solver.workingSet.workingSetSelect(solver); rc != 0 {
-			fmt.Print("*")
+			if !solver.quietMode {
+				fmt.Print("*")
+			}
 			break
 		}
 
@@ -234,7 +239,9 @@ func (solver *solver) solve() solution {
 
 	si.alpha = solver.alpha
 
-	fmt.Printf("\noptimization finished, #iter = %d\n", iter)
+	if !solver.quietMode {
+		fmt.Printf("\noptimization finished, #iter = %d\n", iter)
+	}
 	// solver.q.showCacheStats() // show cache statistics
 
 	return si
@@ -288,10 +295,10 @@ func (solver *solver) updateGradient(Q_i, Q_j []float64, deltaAlpha_i, deltaAlph
 	solver.parRunner.waitAll() // wait for all the parallel runs to complete
 }
 
-func newSolver(l int, q matrixQ, p []float64, y []int8, alpha []float64, penaltyCp, penaltyCn, eps float64, nu bool) solver {
+func newSolver(l int, q matrixQ, p []float64, y []int8, alpha []float64, penaltyCp, penaltyCn, eps float64, nu bool, quietMode bool) solver {
 
 	solver := solver{l: l, q: q, p: p, y: y, alpha: alpha,
-		penaltyCp: penaltyCp, penaltyCn: penaltyCn, eps: eps}
+		penaltyCp: penaltyCp, penaltyCn: penaltyCn, eps: eps, quietMode: quietMode}
 	if nu {
 		solver.workingSet = selectWorkingSetNU{}
 	} else {

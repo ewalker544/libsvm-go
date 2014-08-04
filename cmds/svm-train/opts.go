@@ -21,12 +21,34 @@ import (
 	"flag"
 	"fmt"
 	"github.com/ewalker544/libsvm-go"
+	"io"
+	"io/ioutil"
 	"os"
 	"strconv"
 	"strings"
 )
 
+var outFP io.Writer = os.Stdout
 var gParam *libSvm.Parameter
+
+type probabilityType int
+
+func (q *probabilityType) String() string {
+	return ("Probability Type")
+}
+
+func (q *probabilityType) Set(value string) error {
+	val, err := strconv.Atoi(value)
+	if err != nil || val < 0 || val > 1 {
+		return fmt.Errorf("Invalid probability value (-b %d)\n", val)
+	}
+	if val == 0 {
+		gParam.Probability = false
+	} else {
+		gParam.Probability = true
+	}
+	return nil
+}
 
 type svmType int
 
@@ -37,7 +59,7 @@ func (q *svmType) String() string {
 func (q *svmType) Set(value string) error {
 	val, err := strconv.Atoi(value)
 	if err != nil || val < 0 || val > 4 {
-		return fmt.Errorf("Invalid svm type\n")
+		return fmt.Errorf("Invalid svm type (-s %d)\n", val)
 	}
 	gParam.SvmType = val
 	return nil
@@ -52,7 +74,7 @@ func (q *kernelType) String() string {
 func (q *kernelType) Set(value string) error {
 	val, err := strconv.Atoi(value)
 	if err != nil || val < 0 || val > 4 {
-		return fmt.Errorf("Invalid kernel type\n")
+		return fmt.Errorf("Invalid kernel type (-t %d)\n", val)
 	}
 	gParam.KernelType = val
 	return nil
@@ -108,7 +130,7 @@ func usage() {
 		"-p epsilon : set the epsilon in loss function of epsilon-SVR (default 0.1)\n",
 		"-m cachesize : set cache memory size in MB (default 100)\n",
 		"-e epsilon : set tolerance of termination criterion (default 0.001)\n",
-		"-b : whether to train a SVC or SVR model for probability estimates, true or false (default false)\n",
+		"-b probability_estimates : whether to train a SVC or SVR model for probability estimates, 0 or 1 (default 0)\n",
 		"-w i,weight : set the parameter C of class i to weight*C, for C-SVC (default 1)\n",
 		"-v n: n-fold cross validation mode\n",
 		"-q : quiet mode (no outputs)\n")
@@ -120,6 +142,7 @@ func parseOptions(param *libSvm.Parameter) (nrFold int, trainFile string, modelF
 	var svmTypeFlag svmType
 	var kernelTypeFlag kernelType
 	var weightTypeFlag weightType
+	var probabilityTypeFlag probabilityType
 
 	flag.Var(&svmTypeFlag, "s", "")
 	flag.Var(&kernelTypeFlag, "t", "")
@@ -133,7 +156,7 @@ func parseOptions(param *libSvm.Parameter) (nrFold int, trainFile string, modelF
 	flag.Float64Var(&param.Eps, "e", 0.001, "")
 	flag.Var(&weightTypeFlag, "w", "")
 	flag.IntVar(&nrFold, "v", 0, "")
-	flag.BoolVar(&param.Probability, "b", false, "")
+	flag.Var(&probabilityTypeFlag, "b", "")
 	flag.BoolVar(&param.QuietMode, "q", false, "")
 
 	flag.Usage = usage
@@ -149,6 +172,10 @@ func parseOptions(param *libSvm.Parameter) (nrFold int, trainFile string, modelF
 	default:
 		trainFile = flag.Arg(0)
 		modelFile = flag.Arg(1)
+	}
+
+	if param.QuietMode {
+		outFP = ioutil.Discard
 	}
 
 	return // crossValidation, trainFile, modelFile
