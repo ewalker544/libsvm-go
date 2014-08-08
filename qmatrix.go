@@ -20,9 +20,9 @@
 package libSvm
 
 type matrixQ interface {
-	getQ(i, l int) []float64   // Returns all the Q matrix values for column i
-	getQD() []float64          // Returns the Q matrix values for the diagonal
-	computeQ(i, j int) float64 // Returns the Q matrix value at (i,j)
+	getQ(i, l int) []cacheDataType // Returns all the Q matrix values for column i
+	getQD() []float64              // Returns the Q matrix values for the diagonal
+	computeQ(i, j int) float64     // Returns the Q matrix value at (i,j)
 	showCacheStats()
 }
 
@@ -47,14 +47,14 @@ func (q *svcQ) getQD() []float64 {
 /**
  * Get Q values for column i
  */
-func (q *svcQ) getQ(i, l int) []float64 {
+func (q *svcQ) getQ(i, l int) []cacheDataType {
 	// rcq := make([]float64, l)
 
 	rcq, newData := q.colCache.getData(i)
 	if newData {
 		run := func(start, end int) {
 			for j := start; j < end; j++ { // compute rows
-				rcq[j] = float64(q.y[i]*q.y[j]) * q.kernel.compute(i, j)
+				rcq[j] = cacheDataType(q.y[i]*q.y[j]) * cacheDataType(q.kernel.compute(i, j))
 			}
 		}
 
@@ -113,7 +113,7 @@ func (q *oneClassQ) getQD() []float64 {
 /**
  * Get Q values for column i
  */
-func (q *oneClassQ) getQ(i, l int) []float64 {
+func (q *oneClassQ) getQ(i, l int) []cacheDataType {
 	/*
 		rcq := make([]float64, l)
 
@@ -126,7 +126,7 @@ func (q *oneClassQ) getQ(i, l int) []float64 {
 	if newData {
 		run := func(start, end int) {
 			for j := start; j < end; j++ { // compute rows
-				rcq[j] = q.kernel.compute(i, j)
+				rcq[j] = cacheDataType(q.kernel.compute(i, j))
 			}
 		}
 
@@ -202,7 +202,7 @@ func (q *svrQ) getQD() []float64 {
 /**
  * Get Q values for column i
  */
-func (q *svrQ) getQ(i, l int) []float64 { // @param l is 2 * q.l
+func (q *svrQ) getQ(i, l int) []cacheDataType { // @param l is 2 * q.l
 	sign_i := q.sign(i)
 	real_i := q.real_idx(i)
 
@@ -222,8 +222,8 @@ func (q *svrQ) getQ(i, l int) []float64 { // @param l is 2 * q.l
 		run := func(start, end int) {
 			for j := start; j < end; j++ { // compute rows
 				t := q.kernel.compute(real_i, j)
-				rcq[j] = sign_i * q.sign(j) * t
-				rcq[j+q.l] = sign_i * q.sign(j+l) * t
+				rcq[j] = cacheDataType(sign_i * q.sign(j) * t)
+				rcq[j+q.l] = cacheDataType(sign_i * q.sign(j+l) * t)
 			}
 		}
 

@@ -23,27 +23,30 @@ import (
 	"fmt"
 )
 
+// To allow the LRU cache to store values of a different type, modify BOTH cacheDataType and sizeOfCacheDataType
+type cacheDataType float32
+
+const sizeOfCacheDataType = 4
+
 type cacheNode struct {
-	index    int           // column index for which this cacheNode is caching
-	refCount int           // number of times this column was referenced
-	data     []float64     // valid slice from cache::cacheBuffer if in the cache
-	offset   int           // offset in cache::cacheBuffer data field is referring too
-	element  *list.Element // list element (iterator) if in LRU list
+	index    int             // column index for which this cacheNode is caching
+	refCount int             // number of times this column was referenced
+	data     []cacheDataType // valid slice from cache::cacheBuffer if in the cache
+	offset   int             // offset in cache::cacheBuffer data field is referring too
+	element  *list.Element   // list element (iterator) if in LRU list
 }
 
 type cache struct {
-	head            []cacheNode // all the possible cached columns
-	colSize         int         // size of each column
-	cacheAvail      int         // number of additional columns we can store
-	cacheBuffer     []float64   // pre-allocated buffer for cache
-	availableOffset int         // next available offset in cacheBuffer
-	hits, misses    int         // cache statistics
-	cacheList       *list.List  // LRU list
+	head            []cacheNode     // all the possible cached columns
+	colSize         int             // size of each column
+	cacheAvail      int             // number of additional columns we can store
+	cacheBuffer     []cacheDataType // pre-allocated buffer for cache
+	availableOffset int             // next available offset in cacheBuffer
+	hits, misses    int             // cache statistics
+	cacheList       *list.List      // LRU list
 }
 
-const sizeOfFloat64 = 8
-
-func (c *cache) getData(i int) ([]float64, bool) {
+func (c *cache) getData(i int) ([]cacheDataType, bool) {
 	var newData bool = true
 
 	c.head[i].refCount++ // count reference to this index
@@ -96,9 +99,9 @@ func (c cache) stats() {
 
 func computeCacheSize(colSize, cacheSize int) int {
 
-	cacheSizeBytes := cacheSize * (1 << 20)               // multiply by 1 Mbytes
-	numCols := cacheSizeBytes / (colSize * sizeOfFloat64) // num of columns we can store
-	numCols = maxi(2, numCols)                            // we should be able to store at least 2
+	cacheSizeBytes := cacheSize * (1 << 20)                     // multiply by 1 Mbytes
+	numCols := cacheSizeBytes / (colSize * sizeOfCacheDataType) // num of columns we can store
+	numCols = maxi(2, numCols)                                  // we should be able to store at least 2
 
 	return numCols
 }
@@ -116,7 +119,7 @@ func newCache(l, colSize, cacheSize int) *cache {
 	}
 
 	c := cache{head: head, colSize: colSize, cacheAvail: colCacheSize, availableOffset: 0, hits: 0, misses: 0}
-	c.cacheBuffer = make([]float64, colCacheSize*colSize)
+	c.cacheBuffer = make([]cacheDataType, colCacheSize*colSize)
 	c.cacheList = list.New()
 
 	return &c

@@ -99,7 +99,7 @@ func (solver *solver) solve() solution {
 		Q_i := solver.q.getQ(i, solver.l) // getQ() is parallelized in the respective matrixQ implementation
 		// solver.initGradientInnerLoop(Q_i, alpha_i) // no improvement
 		for j := 0; j < solver.l; j++ {
-			solver.gradient[j] += alpha_i * Q_i[j]
+			solver.gradient[j] += alpha_i * float64(Q_i[j])
 		}
 	}
 	// solver.initGradient() // Alternative parallelization strategy - no improvement
@@ -145,7 +145,7 @@ func (solver *solver) solve() solution {
 
 		if solver.y[i] != solver.y[j] {
 
-			quad_coef := solver.qd[i] + solver.qd[j] + 2*Q_i[j]
+			quad_coef := solver.qd[i] + solver.qd[j] + 2*float64(Q_i[j])
 			if quad_coef <= 0 {
 				quad_coef = TAU
 			}
@@ -181,7 +181,7 @@ func (solver *solver) solve() solution {
 
 		} else {
 
-			quad_coef := solver.qd[i] + solver.qd[j] - 2*Q_i[j]
+			quad_coef := solver.qd[i] + solver.qd[j] - 2*float64(Q_i[j])
 			if quad_coef <= 0 {
 				quad_coef = TAU
 			}
@@ -282,11 +282,11 @@ func (solver *solver) initGradient() {
 	runner.waitAll()
 }
 
-func (solver *solver) updateGradient(Q_i, Q_j []float64, deltaAlpha_i, deltaAlpha_j float64) {
+func (solver *solver) updateGradient(Q_i, Q_j []cacheDataType, deltaAlpha_i, deltaAlpha_j float64) {
 
 	run := func(start, end int) {
 		for k := start; k < end; k++ {
-			t := Q_i[k]*deltaAlpha_i + Q_j[k]*deltaAlpha_j
+			t := float64(Q_i[k])*deltaAlpha_i + float64(Q_j[k])*deltaAlpha_j
 			solver.gradient[k] += t
 		}
 	}

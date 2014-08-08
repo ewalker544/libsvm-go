@@ -81,7 +81,7 @@ func (s selectWorkingSet) workingSetSelect(solver *solver) (int, int, int) {
 				grad_diff := gmax + solver.gradient[j]
 				if grad_diff > 0 {
 					var obj_diff float64
-					quad_coef := solver.qd[i] + solver.qd[j] - 2.0*float64(solver.y[i])*Qi[j]
+					quad_coef := solver.qd[i] + solver.qd[j] - 2.0*float64(solver.y[i])*float64(Qi[j])
 					if quad_coef > 0 {
 						obj_diff = -(grad_diff * grad_diff) / quad_coef
 					} else {
@@ -98,7 +98,7 @@ func (s selectWorkingSet) workingSetSelect(solver *solver) (int, int, int) {
 				grad_diff := gmax - solver.gradient[j]
 				if grad_diff > 0 {
 					var obj_diff float64
-					quad_coeff := solver.qd[i] + solver.qd[j] + 2.0*float64(solver.y[i])*Qi[j]
+					quad_coeff := solver.qd[i] + solver.qd[j] + 2.0*float64(solver.y[i])*float64(Qi[j])
 					if quad_coeff > 0 {
 						obj_diff = -(grad_diff * grad_diff) / quad_coeff
 					} else {
@@ -199,11 +199,11 @@ func (s selectWorkingSetNU) workingSetSelect(solver *solver) (int, int, int) {
 	ip := gmaxp_idx
 	in := gmaxn_idx
 
-	var Qip []float64
+	var Qip []cacheDataType
 	if ip != -1 {
 		Qip = solver.q.getQ(ip, solver.l)
 	}
-	var Qin []float64
+	var Qin []cacheDataType
 	if in != -1 {
 		Qin = solver.q.getQ(in, solver.l)
 	}
@@ -214,7 +214,7 @@ func (s selectWorkingSetNU) workingSetSelect(solver *solver) (int, int, int) {
 				grad_diff := gmaxp + solver.gradient[j]
 				if grad_diff > 0 {
 					var obj_diff float64
-					quad_coef := solver.qd[ip] + solver.qd[j] - 2*Qip[j]
+					quad_coef := solver.qd[ip] + solver.qd[j] - 2*float64(Qip[j])
 					if quad_coef > 0 {
 						obj_diff = -(grad_diff * grad_diff) / quad_coef
 					} else {
@@ -232,7 +232,7 @@ func (s selectWorkingSetNU) workingSetSelect(solver *solver) (int, int, int) {
 				grad_diff := gmaxn - solver.gradient[j]
 				if grad_diff > 0 {
 					var obj_diff float64
-					quad_coef := solver.qd[in] + solver.qd[j] - 2*Qin[j]
+					quad_coef := solver.qd[in] + solver.qd[j] - 2*float64(Qin[j])
 					if quad_coef > 0 {
 						obj_diff = -(grad_diff * grad_diff) / quad_coef
 					} else {
