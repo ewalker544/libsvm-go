@@ -247,23 +247,19 @@ func (solver *solver) solve() solution {
 
 func (solver *solver) initGradientInnerLoop(Q_i []cacheDataType, alpha_i float64) {
 
-	run := func(start, end int) {
+	run := func(tid, start, end int) {
 		// for j := 0; j < solver.l; j++
 		for j := start; j < end; j++ {
 			solver.gradient[j] += alpha_i * float64(Q_i[j])
 		}
 	}
 
-	// We CANNOT use solver.parRunner here because that has been initialized with prob.l
-	// solver.l == 2 * prob.l in the case for SVRQ
-	// Therefore we create this just once in the initialization phase of the Solve() method
-	runner := newParallelRunner(solver.l, solver.numCPU)
-	runner.run(run)
-	runner.waitAll()
+	solver.parRunner.run(run)
+	solver.parRunner.waitAll()
 }
 
 func (solver *solver) initGradient() {
-	run := func(start, end int) {
+	run := func(tid, start, end int) {
 		//for j := 0; j < solver.l; j++ {
 		for j := start; j < end; j++ {
 			for i := 0; i < solver.l; i++ {
@@ -272,17 +268,13 @@ func (solver *solver) initGradient() {
 		}
 	}
 
-	// We CANNOT use solver.parRunner here because that has been initialized with prob.l
-	// solver.l == 2 * prob.l in the case for SVRQ
-	// Therefore we create this just once in the initialization phase of the Solve() method
-	runner := newParallelRunner(solver.l, solver.numCPU)
-	runner.run(run)
-	runner.waitAll()
+	solver.parRunner.run(run)
+	solver.parRunner.waitAll()
 }
 
 func (solver *solver) updateGradient(Q_i, Q_j []cacheDataType, deltaAlpha_i, deltaAlpha_j float64) {
 
-	run := func(start, end int) {
+	run := func(tid, start, end int) {
 		for k := start; k < end; k++ {
 			t := float64(Q_i[k])*deltaAlpha_i + float64(Q_j[k])*deltaAlpha_j
 			solver.gradient[k] += t

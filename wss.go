@@ -28,14 +28,13 @@ type workingSetSelecter interface {
 	calculateRho(solver *solver) (float64, float64)
 }
 
-type selectWorkingSet struct{}
+type selectWorkingSet struct{} // for classical solver
 
-type selectWorkingSetNU struct{}
+type selectWorkingSetNU struct{} // for NU solver
 
 func (s selectWorkingSet) workingSetSelect(solver *solver) (int, int, int) {
 	var gmax float64 = -math.MaxFloat64
 	var gmax2 float64 = -math.MaxFloat64
-	var obj_diff_min float64 = math.MaxFloat64
 	var gmax_idx int = -1
 	var gmin_idx int = -1
 
@@ -75,46 +74,75 @@ func (s selectWorkingSet) workingSetSelect(solver *solver) (int, int, int) {
 
 	Qi := solver.q.getQ(i, solver.l)
 
-	for j := 0; j < solver.l; j++ {
-		if solver.y[j] == 1 {
-			if !solver.isLowerBound(j) {
-				grad_diff := gmax + solver.gradient[j]
-				if grad_diff > 0 {
-					var obj_diff float64
-					quad_coef := solver.qd[i] + solver.qd[j] - 2.0*float64(solver.y[i])*float64(Qi[j])
-					if quad_coef > 0 {
-						obj_diff = -(grad_diff * grad_diff) / quad_coef
-					} else {
-						obj_diff = -(grad_diff * grad_diff) / TAU
-					}
-					if obj_diff <= obj_diff_min {
-						obj_diff_min = obj_diff
-						gmin_idx = j
+	gmin_idx = s.findGminIdx(i, gmax, Qi, solver)
+
+	//fmt.Printf("gmax_idx=%d, gmin_idx=%d\n", gmax_idx, gmin_idx)
+	return gmax_idx, gmin_idx, 0
+}
+
+func (s *selectWorkingSet) findGminIdx(i int, gmax float64, Qi []cacheDataType, solver *solver) (gmin_idx int) {
+
+	objDiffMin := make([]float64, solver.parRunner.numCPU)
+	idx := make([]int, solver.parRunner.numCPU)
+	for k := 0; k < solver.parRunner.numCPU; k++ {
+		objDiffMin[k] = math.MaxFloat64
+		idx[k] = -1
+	}
+
+	run := func(tid, start, end int) {
+		//for j := 0; j < solver.l; j++ {
+		for j := start; j < end; j++ {
+			if solver.y[j] == 1 {
+				if !solver.isLowerBound(j) {
+					grad_diff := gmax + solver.gradient[j]
+					if grad_diff > 0 {
+						var obj_diff float64
+						quad_coef := solver.qd[i] + solver.qd[j] - 2.0*float64(solver.y[i])*float64(Qi[j])
+						if quad_coef > 0 {
+							obj_diff = -(grad_diff * grad_diff) / quad_coef
+						} else {
+							obj_diff = -(grad_diff * grad_diff) / TAU
+						}
+						if obj_diff <= objDiffMin[tid] {
+							objDiffMin[tid] = obj_diff
+							idx[tid] = j
+						}
 					}
 				}
-			}
-		} else {
-			if !solver.isUpperBound(j) {
-				grad_diff := gmax - solver.gradient[j]
-				if grad_diff > 0 {
-					var obj_diff float64
-					quad_coeff := solver.qd[i] + solver.qd[j] + 2.0*float64(solver.y[i])*float64(Qi[j])
-					if quad_coeff > 0 {
-						obj_diff = -(grad_diff * grad_diff) / quad_coeff
-					} else {
-						obj_diff = -(grad_diff * grad_diff) / quad_coeff
-					}
-					if obj_diff <= obj_diff_min {
-						obj_diff_min = obj_diff
-						gmin_idx = j
+			} else {
+				if !solver.isUpperBound(j) {
+					grad_diff := gmax - solver.gradient[j]
+					if grad_diff > 0 {
+						var obj_diff float64
+						quad_coeff := solver.qd[i] + solver.qd[j] + 2.0*float64(solver.y[i])*float64(Qi[j])
+						if quad_coeff > 0 {
+							obj_diff = -(grad_diff * grad_diff) / quad_coeff
+						} else {
+							obj_diff = -(grad_diff * grad_diff) / quad_coeff
+						}
+						if obj_diff <= objDiffMin[tid] {
+							objDiffMin[tid] = obj_diff
+							idx[tid] = j
+						}
 					}
 				}
 			}
 		}
 	}
 
-	//fmt.Printf("gmax_idx=%d, gmin_idx=%d\n", gmax_idx, gmin_idx)
-	return gmax_idx, gmin_idx, 0
+	solver.parRunner.run(run)
+	solver.parRunner.waitAll()
+
+	var objMin float64 = objDiffMin[0]
+	gmin_idx = idx[0]
+	for k := 1; k < solver.parRunner.numCPU; k++ {
+		if objDiffMin[k] <= objMin {
+			objMin = objDiffMin[k]
+			gmin_idx = idx[k]
+		}
+	}
+
+	return
 }
 
 func (s selectWorkingSet) calculateRho(solver *solver) (float64, float64) {
@@ -161,7 +189,6 @@ func (s selectWorkingSetNU) workingSetSelect(solver *solver) (int, int, int) {
 	var gmaxn2 float64 = -math.MaxFloat64
 	var gmaxn_idx int = -1
 
-	var obj_diff_min float64 = math.MaxFloat64
 	var gmin_idx int = -1
 
 	for i := 0; i < solver.l; i++ {
@@ -208,45 +235,7 @@ func (s selectWorkingSetNU) workingSetSelect(solver *solver) (int, int, int) {
 		Qin = solver.q.getQ(in, solver.l)
 	}
 
-	for j := 0; j < solver.l; j++ {
-		if solver.y[j] == 1 {
-			if !solver.isLowerBound(j) {
-				grad_diff := gmaxp + solver.gradient[j]
-				if grad_diff > 0 {
-					var obj_diff float64
-					quad_coef := solver.qd[ip] + solver.qd[j] - 2*float64(Qip[j])
-					if quad_coef > 0 {
-						obj_diff = -(grad_diff * grad_diff) / quad_coef
-					} else {
-						obj_diff = -(grad_diff * grad_diff) / TAU
-					}
-
-					if obj_diff <= obj_diff_min {
-						obj_diff_min = obj_diff
-						gmin_idx = j
-					}
-				}
-			}
-		} else {
-			if !solver.isUpperBound(j) {
-				grad_diff := gmaxn - solver.gradient[j]
-				if grad_diff > 0 {
-					var obj_diff float64
-					quad_coef := solver.qd[in] + solver.qd[j] - 2*float64(Qin[j])
-					if quad_coef > 0 {
-						obj_diff = -(grad_diff * grad_diff) / quad_coef
-					} else {
-						obj_diff = -(grad_diff * grad_diff) / TAU
-					}
-
-					if obj_diff <= obj_diff_min {
-						obj_diff_min = obj_diff
-						gmin_idx = j
-					}
-				}
-			}
-		}
-	}
+	gmin_idx = s.findGminIdx(ip, in, gmaxp, gmaxn, Qip, Qin, solver)
 
 	var out_j int = gmin_idx
 	var out_i int
@@ -257,6 +246,73 @@ func (s selectWorkingSetNU) workingSetSelect(solver *solver) (int, int, int) {
 	}
 
 	return out_i, out_j, 0
+}
+
+func (s selectWorkingSetNU) findGminIdx(ip, in int, gmaxp, gmaxn float64, Qip, Qin []cacheDataType, solver *solver) (gmin_idx int) {
+
+	objDiffMin := make([]float64, solver.parRunner.numCPU)
+	idx := make([]int, solver.parRunner.numCPU)
+	for k := 0; k < solver.parRunner.numCPU; k++ {
+		objDiffMin[k] = math.MaxFloat64
+		idx[k] = -1
+	}
+
+	run := func(tid, start, end int) {
+		//for j := 0; j < solver.l; j++ {
+		for j := start; j < end; j++ {
+			if solver.y[j] == 1 {
+				if !solver.isLowerBound(j) {
+					grad_diff := gmaxp + solver.gradient[j]
+					if grad_diff > 0 {
+						var obj_diff float64
+						quad_coef := solver.qd[ip] + solver.qd[j] - 2*float64(Qip[j])
+						if quad_coef > 0 {
+							obj_diff = -(grad_diff * grad_diff) / quad_coef
+						} else {
+							obj_diff = -(grad_diff * grad_diff) / TAU
+						}
+
+						if obj_diff <= objDiffMin[tid] {
+							objDiffMin[tid] = obj_diff
+							idx[tid] = j
+						}
+					}
+				}
+			} else {
+				if !solver.isUpperBound(j) {
+					grad_diff := gmaxn - solver.gradient[j]
+					if grad_diff > 0 {
+						var obj_diff float64
+						quad_coef := solver.qd[in] + solver.qd[j] - 2*float64(Qin[j])
+						if quad_coef > 0 {
+							obj_diff = -(grad_diff * grad_diff) / quad_coef
+						} else {
+							obj_diff = -(grad_diff * grad_diff) / TAU
+						}
+
+						if obj_diff <= objDiffMin[tid] {
+							objDiffMin[tid] = obj_diff
+							idx[tid] = j
+						}
+					}
+				}
+			}
+		}
+	}
+
+	solver.parRunner.run(run)
+	solver.parRunner.waitAll()
+
+	var objMin float64 = objDiffMin[0]
+	gmin_idx = idx[0]
+	for k := 1; k < solver.parRunner.numCPU; k++ {
+		if objDiffMin[k] <= objMin {
+			objMin = objDiffMin[k]
+			gmin_idx = idx[k]
+		}
+	}
+
+	return
 }
 
 func (s selectWorkingSetNU) calculateRho(solver *solver) (float64, float64) {

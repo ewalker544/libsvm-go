@@ -52,17 +52,17 @@ func (p *parallelRunner) reset() {
 	p.start = 0
 }
 
-func (p parallelRunner) run(f func(int, int)) {
+func (p parallelRunner) run(f func(int, int, int)) {
 
-	funcWrap := func(start, end int) {
-		f(start, end)
+	funcWrap := func(tid, start, end int) {
+		f(tid, start, end)
 		p.done <- true
 	}
 
 	p.reset()
 	for i := 0; i < p.numCPU; i++ {
 		start, end := p.next()
-		go funcWrap(start, end)
+		go funcWrap(i, start, end)
 	}
 }
 

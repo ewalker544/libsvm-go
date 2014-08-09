@@ -52,7 +52,7 @@ func (q *svcQ) getQ(i, l int) []cacheDataType {
 
 	rcq, newData := q.colCache.getData(i)
 	if newData {
-		run := func(start, end int) {
+		run := func(tid, start, end int) {
 			for j := start; j < end; j++ { // compute rows
 				rcq[j] = cacheDataType(q.y[i]*q.y[j]) * cacheDataType(q.kernel.compute(i, j))
 			}
@@ -124,7 +124,7 @@ func (q *oneClassQ) getQ(i, l int) []cacheDataType {
 
 	rcq, newData := q.colCache.getData(i)
 	if newData {
-		run := func(start, end int) {
+		run := func(tid, start, end int) {
 			for j := start; j < end; j++ { // compute rows
 				rcq[j] = cacheDataType(q.kernel.compute(i, j))
 			}
@@ -219,7 +219,7 @@ func (q *svrQ) getQ(i, l int) []cacheDataType { // @param l is 2 * q.l
 	// NOTE: query cache with "real_i" since cache stores [0,l)
 	rcq, newData := q.colCache.getData(real_i)
 	if newData {
-		run := func(start, end int) {
+		run := func(tid, start, end int) {
 			for j := start; j < end; j++ { // compute rows
 				t := q.kernel.compute(real_i, j)
 				rcq[j] = cacheDataType(sign_i * q.sign(j) * t)
