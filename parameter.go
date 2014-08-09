@@ -54,9 +54,10 @@ type Parameter struct {
 	Probability bool // Should probability estimation be performed?
 	CacheSize   int  // Size of Q matrix cache
 	QuietMode   bool // quiet mode
+	NumCPU      int  // Number of CPUs to use
 }
 
 func NewParameter() *Parameter {
 	return &Parameter{SvmType: C_SVC, KernelType: RBF, Degree: 3, Gamma: 0, Coef0: 0, Nu: 0.5, C: 1, Eps: 1e-3, P: 0.1,
-		NrWeight: 0, Probability: false, CacheSize: 100, QuietMode: false}
+		NrWeight: 0, Probability: false, CacheSize: 100, QuietMode: false, NumCPU: -1}
 }

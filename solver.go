@@ -45,6 +45,7 @@ type solver struct {
 	workingSet   workingSetSelecter
 	parRunner    parallelRunner
 	quietMode    bool
+	numCPU       int
 }
 
 func (solver solver) isUpperBound(i int) bool {
@@ -97,10 +98,7 @@ func (solver *solver) solve() solution {
 	for i := 0; i < solver.l; i++ {
 		var alpha_i float64 = solver.alpha[i]
 		Q_i := solver.q.getQ(i, solver.l) // getQ() is parallelized in the respective matrixQ implementation
-		// solver.initGradientInnerLoop(Q_i, alpha_i) // no improvement
-		for j := 0; j < solver.l; j++ {
-			solver.gradient[j] += alpha_i * float64(Q_i[j])
-		}
+		solver.initGradientInnerLoop(Q_i, alpha_i)
 	}
 	// solver.initGradient() // Alternative parallelization strategy - no improvement
 
@@ -247,19 +245,19 @@ func (solver *solver) solve() solution {
 	return si
 }
 
-func (solver *solver) initGradientInnerLoop(Q_i []float64, alpha_i float64) {
+func (solver *solver) initGradientInnerLoop(Q_i []cacheDataType, alpha_i float64) {
 
 	run := func(start, end int) {
 		// for j := 0; j < solver.l; j++
 		for j := start; j < end; j++ {
-			solver.gradient[j] += alpha_i * Q_i[j]
+			solver.gradient[j] += alpha_i * float64(Q_i[j])
 		}
 	}
 
 	// We CANNOT use solver.parRunner here because that has been initialized with prob.l
 	// solver.l == 2 * prob.l in the case for SVRQ
 	// Therefore we create this just once in the initialization phase of the Solve() method
-	runner := newParallelRunner(solver.l)
+	runner := newParallelRunner(solver.l, solver.numCPU)
 	runner.run(run)
 	runner.waitAll()
 }
@@ -277,7 +275,7 @@ func (solver *solver) initGradient() {
 	// We CANNOT use solver.parRunner here because that has been initialized with prob.l
 	// solver.l == 2 * prob.l in the case for SVRQ
 	// Therefore we create this just once in the initialization phase of the Solve() method
-	runner := newParallelRunner(solver.l)
+	runner := newParallelRunner(solver.l, solver.numCPU)
 	runner.run(run)
 	runner.waitAll()
 }
@@ -295,17 +293,17 @@ func (solver *solver) updateGradient(Q_i, Q_j []cacheDataType, deltaAlpha_i, del
 	solver.parRunner.waitAll() // wait for all the parallel runs to complete
 }
 
-func newSolver(l int, q matrixQ, p []float64, y []int8, alpha []float64, penaltyCp, penaltyCn, eps float64, nu bool, quietMode bool) solver {
+func newSolver(l int, q matrixQ, p []float64, y []int8, alpha []float64, penaltyCp, penaltyCn, eps float64, nu bool, quietMode bool, numCPU int) solver {
 
 	solver := solver{l: l, q: q, p: p, y: y, alpha: alpha,
-		penaltyCp: penaltyCp, penaltyCn: penaltyCn, eps: eps, quietMode: quietMode}
+		penaltyCp: penaltyCp, penaltyCn: penaltyCn, eps: eps, quietMode: quietMode, numCPU: numCPU}
 	if nu {
 		solver.workingSet = selectWorkingSetNU{}
 	} else {
 		solver.workingSet = selectWorkingSet{}
 	}
 	solver.qd = q.getQD()
-	solver.parRunner = newParallelRunner(solver.l)
+	solver.parRunner = newParallelRunner(solver.l, numCPU)
 
 	return solver
 }

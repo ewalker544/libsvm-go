@@ -133,7 +133,8 @@ func usage() {
 		"-b probability_estimates : whether to train a SVC or SVR model for probability estimates, 0 or 1 (default 0)\n",
 		"-w i,weight : set the parameter C of class i to weight*C, for C-SVC (default 1)\n",
 		"-v n: n-fold cross validation mode\n",
-		"-q : quiet mode (no outputs)\n")
+		"-q : quiet mode (no outputs)\n",
+		"-N n: number of CPUs to use (default -1 uses all available logical CPUs)\n")
 }
 
 func parseOptions(param *libSvm.Parameter) (nrFold int, trainFile string, modelFile string) {
@@ -158,6 +159,7 @@ func parseOptions(param *libSvm.Parameter) (nrFold int, trainFile string, modelF
 	flag.IntVar(&nrFold, "v", 0, "")
 	flag.Var(&probabilityTypeFlag, "b", "")
 	flag.BoolVar(&param.QuietMode, "q", false, "")
+	flag.IntVar(&param.NumCPU, "N", -1, "")
 
 	flag.Usage = usage
 	flag.Parse()
