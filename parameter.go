@@ -18,6 +18,8 @@
  */
 package libSvm
 
+const LibSvmCudaVersion = 0.318
+
 const (
 	C_SVC       = iota
 	NU_SVC      = iota
