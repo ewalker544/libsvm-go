@@ -138,8 +138,8 @@ func (solver *solver) solve() solution {
 		oldAlpha_i := solver.alpha[i]
 		oldAlpha_j := solver.alpha[j]
 
-		Q_i := solver.q.getQ(i, solver.l) // column i of Q matrix
-		Q_j := solver.q.getQ(j, solver.l) // column j of Q matrix
+		Q_i := solver.q.getQ(i, solver.l) // row i of Q matrix
+		Q_j := solver.q.getQ(j, solver.l) // row j of Q matrix
 
 		if solver.y[i] != solver.y[j] {
 

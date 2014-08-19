@@ -13,7 +13,7 @@
 ** See the License for the specific language governing permissions and
 ** limitations under the License.
 **
-** Description: Caches Q matrix columns.  The cache implements a LRU (Last Recently Used) eviction policy.
+** Description: Caches Q matrix rows.  The cache implements a LRU (Last Recently Used) eviction policy.
 ** @author: Ed Walker
  */
 package libSvm
@@ -29,17 +29,17 @@ type cacheDataType float32
 const sizeOfCacheDataType = 4
 
 type cacheNode struct {
-	index    int             // column index for which this cacheNode is caching
-	refCount int             // number of times this column was referenced
+	index    int             // row index for which this cacheNode is caching
+	refCount int             // number of times this row was referenced
 	data     []cacheDataType // valid slice from cache::cacheBuffer if in the cache
 	offset   int             // offset in cache::cacheBuffer data field is referring too
 	element  *list.Element   // list element (iterator) if in LRU list
 }
 
 type cache struct {
-	head            []cacheNode     // all the possible cached columns
-	colSize         int             // size of each column
-	cacheAvail      int             // number of additional columns we can store
+	head            []cacheNode     // all the possible cached rows
+	rowSize         int             // size of each row
+	cacheAvail      int             // number of additional rows we can store
 	cacheBuffer     []cacheDataType // pre-allocated buffer for cache
 	availableOffset int             // next available offset in cacheBuffer
 	hits, misses    int             // cache statistics
@@ -62,7 +62,7 @@ func (c *cache) getData(i int) ([]cacheDataType, bool) {
 		var useOffset int = 0
 		// new data
 		if c.cacheAvail == 0 { // no more space in cache
-			// free a column
+			// free a row
 
 			//Remove the front of the LRU list (the last used)
 			oldElement := c.cacheList.Front()
@@ -75,10 +75,10 @@ func (c *cache) getData(i int) ([]cacheDataType, bool) {
 			c.cacheAvail++
 		} else {
 			useOffset = c.availableOffset
-			c.availableOffset += c.colSize
+			c.availableOffset += c.rowSize
 		}
 
-		c.head[i].data = c.cacheBuffer[useOffset : useOffset+c.colSize]
+		c.head[i].data = c.cacheBuffer[useOffset : useOffset+c.rowSize]
 		c.head[i].offset = useOffset // remember which offsef this cache line has been assigned
 
 		c.cacheAvail--
@@ -97,18 +97,18 @@ func (c cache) stats() {
 	fmt.Printf("Cache efficiency: %.6f%%\n", float32(c.hits)/float32(c.hits+c.misses)*100)
 }
 
-func computeCacheSize(colSize, cacheSize int) int {
+func computeCacheSize(rowSize, cacheSize int) int {
 
 	cacheSizeBytes := cacheSize * (1 << 20)                     // multiply by 1 Mbytes
-	numCols := cacheSizeBytes / (colSize * sizeOfCacheDataType) // num of columns we can store
+	numCols := cacheSizeBytes / (rowSize * sizeOfCacheDataType) // num of rows we can store
 	numCols = maxi(2, numCols)                                  // we should be able to store at least 2
 
 	return numCols
 }
 
-func newCache(l, colSize, cacheSize int) *cache {
+func newCache(l, rowSize, cacheSize int) *cache {
 
-	colCacheSize := computeCacheSize(colSize, cacheSize) // number of columns we can cache
+	rowCacheSize := computeCacheSize(rowSize, cacheSize) // number of rows we can cache
 
 	head := make([]cacheNode, l)
 	for i := 0; i < l; i++ {
@@ -118,8 +118,8 @@ func newCache(l, colSize, cacheSize int) *cache {
 		head[i].offset = -1
 	}
 
-	c := cache{head: head, colSize: colSize, cacheAvail: colCacheSize, availableOffset: 0, hits: 0, misses: 0}
-	c.cacheBuffer = make([]cacheDataType, colCacheSize*colSize)
+	c := cache{head: head, rowSize: rowSize, cacheAvail: rowCacheSize, availableOffset: 0, hits: 0, misses: 0}
+	c.cacheBuffer = make([]cacheDataType, rowCacheSize*rowSize)
 	c.cacheList = list.New()
 
 	return &c

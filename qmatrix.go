@@ -20,7 +20,7 @@
 package libSvm
 
 type matrixQ interface {
-	getQ(i, l int) []cacheDataType // Returns all the Q matrix values for column i
+	getQ(i, l int) []cacheDataType // Returns all the Q matrix values for row i
 	getQD() []float64              // Returns the Q matrix values for the diagonal
 	computeQ(i, j int) float64     // Returns the Q matrix value at (i,j)
 	showCacheStats()
@@ -45,15 +45,14 @@ func (q *svcQ) getQD() []float64 {
 }
 
 /**
- * Get Q values for column i
+ * Get Q values for row i
  */
 func (q *svcQ) getQ(i, l int) []cacheDataType {
-	// rcq := make([]float64, l)
 
 	rcq, newData := q.colCache.getData(i)
 	if newData {
 		run := func(tid, start, end int) {
-			for j := start; j < end; j++ { // compute rows
+			for j := start; j < end; j++ { // compute column elements
 				rcq[j] = cacheDataType(q.y[i]*q.y[j]) * cacheDataType(q.kernel.compute(i, j))
 			}
 		}
@@ -111,21 +110,14 @@ func (q *oneClassQ) getQD() []float64 {
 }
 
 /**
- * Get Q values for column i
+ * Get Q values for row i
  */
 func (q *oneClassQ) getQ(i, l int) []cacheDataType {
-	/*
-		rcq := make([]float64, l)
-
-			for j := 0; j < l; j++ { // compute rows
-				rcq[j] = q.kernel.compute(i, j)
-			}
-	*/
 
 	rcq, newData := q.colCache.getData(i)
 	if newData {
 		run := func(tid, start, end int) {
-			for j := start; j < end; j++ { // compute rows
+			for j := start; j < end; j++ { // compute column elements
 				rcq[j] = cacheDataType(q.kernel.compute(i, j))
 			}
 		}
@@ -200,27 +192,17 @@ func (q *svrQ) getQD() []float64 {
 }
 
 /**
- * Get Q values for column i
+ * Get Q values for row i
  */
 func (q *svrQ) getQ(i, l int) []cacheDataType { // @param l is 2 * q.l
 	sign_i := q.sign(i)
 	real_i := q.real_idx(i)
 
-	/*
-		rcq := make([]float64, 2*q.l)
-
-		for j := 0; j < q.l; j++ { // compute rows
-			t := q.kernel.compute(real_i, j)
-			rcq[j] = sign_i * q.sign(j) * t
-			rcq[j+q.l] = sign_i * q.sign(j+l) * t
-		}
-	*/
-
 	// NOTE: query cache with "real_i" since cache stores [0,l)
 	rcq, newData := q.colCache.getData(real_i)
 	if newData {
 		run := func(tid, start, end int) {
-			for j := start; j < end; j++ { // compute rows
+			for j := start; j < end; j++ { // compute column elements
 				t := q.kernel.compute(real_i, j)
 				rcq[j] = cacheDataType(sign_i * q.sign(j) * t)
 				rcq[j+q.l] = cacheDataType(sign_i * q.sign(j+l) * t)
