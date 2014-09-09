@@ -37,8 +37,9 @@ This port has no external package dependencies, and uses only the native standar
     
     model.ReadModel("log1p.E2006.model")   // Populate the model from the model file
     
-    var x int[int]float64
+    var x map[int]float64
     // Populate x with the test vector
+    
     predictLabel := model.Predict(x)    // Predicts a float64 label given the test vector 
     
     
