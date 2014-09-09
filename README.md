@@ -55,6 +55,6 @@ For full documentation of the <code>svm-train</code> and <code>svm-predict</code
     
     
 
-[1] http://www.csie.ntu.edu.tw/~cjlin/libsvm/
+[1]: http://www.csie.ntu.edu.tw/~cjlin/libsvm/
     
     
