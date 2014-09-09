@@ -25,7 +25,7 @@ For full documentation of the <code>svm-train</code> and <code>svm-predict</code
 ### Training
     import "github.com/ewalker544/libsvm-go"
     
-    param := libsvm.NewParameter()      // Create a parameter object with default values
+    param := libSvm.NewParameter()      // Create a parameter object with default values
     param.KernelType = libSvm.LINEAR    // Use the linear (dot product) kernel
     
     model := libSvm.NewModel(param)     // Create a model object from the parameter attributes
@@ -41,11 +41,8 @@ For full documentation of the <code>svm-train</code> and <code>svm-predict</code
 ### Predicting
     import "github.com/ewalker544/libsvm-go"
     
-    param := libSvm.NewParameter()      // Create a parameter object with default values
-    
-    model := libSvm.NewModel(param)     // Create a model object from the parameter attributes
-    
-    model.ReadModel("a9a.model")   // Populate the model from the model file generated from training
+    // Create a model object from the model file generated from training
+    model := libSvm.NewModelFromFile("a9a.model")  
     
     x := make(map[int]float64)
     // Populate x with the test vector
