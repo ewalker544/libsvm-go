@@ -19,7 +19,7 @@ This port has no external package dependencies, and uses only the native standar
     
     model := libSvm.NewModel(param)     // Create a model from the parameter
     
-    // Create a problem specification from the training data (in trainFile) and parameter
+    // Create a problem specification from the training data and parameter
     problem, err := libSvm.NewProblem("log1p.E2006.train", param)
     
     model.Train(problem)                // Train the model from the problem specification
