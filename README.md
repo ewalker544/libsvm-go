@@ -1,7 +1,8 @@
 # libsvm-go
 
 
-Full port of LIBSVM in the Go programming language.
+This is a full port of LIBSVM in the Go programming language.  LIBSVM is a suite of tools and library for support vector classification, regression, and distribution estimation.  This port implements the libsvm library in the form of a Go package called libSvm.  It also implements the svm-train and svm-predict command line tools.
+
 This port has no external package dependencies, and uses only the native standard library.
 
 ## Installation
@@ -14,14 +15,13 @@ This port has no external package dependencies, and uses only the native standar
 ### Training
     import "github.com/ewalker544/libsvm-go"
     
-    param := libsvm.NewParameter()      // Create a parameter struct with default values
-    param.SvmType = libSvm.EPSILON_SVR
-    param.KernelType = libSvm.POLY
+    param := libsvm.NewParameter()      // Create a parameter object with default values
+    param.KernelType = libSvm.LINEAR    // Use the linear (dot product) kernel
     
-    model := libSvm.NewModel(param)     // Create a model from the parameter
+    model := libSvm.NewModel(param)     // Create a model object from the parameter attributes
     
-    // Create a problem specification from the training data and parameter
-    problem, err := libSvm.NewProblem("log1p.E2006.train", param)
+    // Create a problem specification from the training data and parameter attributes
+    problem, err := libSvm.NewProblem("log1p.E2006.train", param) 
     
     model.Train(problem)                // Train the model from the problem specification
     
@@ -31,13 +31,13 @@ This port has no external package dependencies, and uses only the native standar
 ### Predicting
     import "github.com/ewalker544/libsvm-go"
     
-    param := libSvm.NewParameter()      // Create a parameter struct with default values
+    param := libSvm.NewParameter()      // Create a parameter object with default values
     
-    model := libSvm.NewModel(param)     // Create a model from the parameter
+    model := libSvm.NewModel(param)     // Create a model object from the parameter attributes
     
-    model.ReadModel("log1p.E2006.model")   // Populate the model from the model file
+    model.ReadModel("log1p.E2006.model")   // Populate the model from the model file generating from training
     
-    var x map[int]float64
+    x := make(map[int]float64)
     // Populate x with the test vector
     
     predictLabel := model.Predict(x)    // Predicts a float64 label given the test vector 
