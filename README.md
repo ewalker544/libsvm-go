@@ -45,7 +45,7 @@ For full documentation of the <code>svm-train</code> and <code>svm-predict</code
     
     model := libSvm.NewModel(param)     // Create a model object from the parameter attributes
     
-    model.ReadModel("a9a.model")   // Populate the model from the model file generating from training
+    model.ReadModel("a9a.model")   // Populate the model from the model file generated from training
     
     x := make(map[int]float64)
     // Populate x with the test vector
