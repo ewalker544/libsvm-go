@@ -29,11 +29,11 @@ I have tried to make the Go implementation of <code>svm-train</code> and <code>s
     model := libSvm.NewModel(param)     // Create a model object from the parameter attributes
     
     // Create a problem specification from the training data and parameter attributes
-    problem, err := libSvm.NewProblem("log1p.E2006.train", param) 
+    problem, err := libSvm.NewProblem("a9a.train", param) 
     
     model.Train(problem)                // Train the model from the problem specification
     
-    model.Dump("log1p.E2006.model")     // Dump the model into a user-specified file
+    model.Dump("a9a.model")     // Dump the model into a user-specified file
     
     
 ### Predicting
@@ -43,7 +43,7 @@ I have tried to make the Go implementation of <code>svm-train</code> and <code>s
     
     model := libSvm.NewModel(param)     // Create a model object from the parameter attributes
     
-    model.ReadModel("log1p.E2006.model")   // Populate the model from the model file generating from training
+    model.ReadModel("a9a.model")   // Populate the model from the model file generating from training
     
     x := make(map[int]float64)
     // Populate x with the test vector
