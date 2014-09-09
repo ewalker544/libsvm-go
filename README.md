@@ -12,10 +12,18 @@ This port has no external package dependencies, and uses only the native standar
 ## API Example
 
     import "github.com/ewalker544/libsvm-go"
-    param := libsvm.NewParameter()      // Create a parameter
-    model := libSvm.NewModel(param)     // Create a model from the parameter (using the default values)
-    problem, err := libSvm.NewProblem(trainFile, param) // Create a problem specification described by the training file and parameter
+    
+    param := libsvm.NewParameter()      // Create a parameter struct with default values
+    param.SvmType = libSvm.EPSILON_SVR
+    param.KernelType = libSvm.POLY
+    
+    model := libSvm.NewModel(param)     // Create a model from the parameter
+    
+    // Create a problem specification from the training data (in trainFile) and parameter
+    problem, err := libSvm.NewProblem("log1p.E2006.train", param)
+    
     model.Train(problem)                // Train the model from the problem specification
+    
     model.Dump(modelFile)               // Dump the model into a user-specified file
     
     
