@@ -12,7 +12,7 @@ This port has no external package dependencies, and uses only the native standar
 
 ## Compatibility Notes 
 
-I have tried to make the Go implementation of <code>svm-train</code> and <code>svm-predict</code> plug-in compatibile with the original LIBSVM distribution.  This is to allow you to use the other tools available in the original distribution, like <code>easy.py</code> and <code>grid.py</code>.
+I have tried to make the Go implementation of <code>svm-train</code> and <code>svm-predict</code> plug-in compatibile with the original LIBSVM 3.18 distribution.  This is to allow you to use the other tools available in the original distribution, like <code>easy.py</code> and <code>grid.py</code>.
 
 <code>svm-predict</code> should be 100% plug-in compatibile.  However, <code>svm-train</code> is plug-in compatible with one exception.  The exception is the parameter weight flag used in the command.  In this implementation, the flag is
 
