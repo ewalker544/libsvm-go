@@ -26,7 +26,7 @@ For full documentation of the <code>svm-train</code> and <code>svm-predict</code
     import "github.com/ewalker544/libsvm-go"
     
     param := libSvm.NewParameter()      // Create a parameter object with default values
-    param.KernelType = libSvm.LINEAR    // Use the linear (dot product) kernel
+    param.KernelType = libSvm.POLY      // Use the polynomial kernel
     
     model := libSvm.NewModel(param)     // Create a model object from the parameter attributes
     
@@ -35,7 +35,7 @@ For full documentation of the <code>svm-train</code> and <code>svm-predict</code
     
     model.Train(problem)                // Train the model from the problem specification
     
-    model.Dump("a9a.model")     // Dump the model into a user-specified file
+    model.Dump("a9a.model")             // Dump the model into a user-specified file
     
     
 ### Predicting
