@@ -18,6 +18,8 @@ I have tried to make the Go implementation of <code>svm-train</code> and <code>s
 
     -w i,weight : set the parameter C of class i to weight*C, for C-SVC (default 1)
 
+For full documentation of the <code>svm-train</code> and <code>svm-predict</code> commands, please refer to the original [LIBSVM] [1] web site.
+
 ## API Example
 
 ### Training
@@ -52,5 +54,7 @@ I have tried to make the Go implementation of <code>svm-train</code> and <code>s
     
     
     
+
+[1] http://www.csie.ntu.edu.tw/~cjlin/libsvm/
     
     
