@@ -24,33 +24,33 @@ For full documentation of the <code>svm-train</code> and <code>svm-predict</code
 
 ### Training
 ```go
-```import "github.com/ewalker544/libsvm-go"
+import "github.com/ewalker544/libsvm-go"
     
-```param := libSvm.NewParameter()      // Create a parameter object with default values
-```param.KernelType = libSvm.POLY      // Use the polynomial kernel
+param := libSvm.NewParameter()      // Create a parameter object with default values
+param.KernelType = libSvm.POLY      // Use the polynomial kernel
     
-```model := libSvm.NewModel(param)     // Create a model object from the parameter attributes
+model := libSvm.NewModel(param)     // Create a model object from the parameter attributes
     
-```// Create a problem specification from the training data and parameter attributes
-```problem, err := libSvm.NewProblem("a9a.train", param) 
+// Create a problem specification from the training data and parameter attributes
+problem, err := libSvm.NewProblem("a9a.train", param) 
     
-```model.Train(problem)                // Train the model from the problem specification
+model.Train(problem)                // Train the model from the problem specification
     
-```model.Dump("a9a.model")             // Dump the model into a user-specified file
-    
+model.Dump("a9a.model")             // Dump the model into a user-specified file
+```    
     
 ### Predicting
 ```go
-```import "github.com/ewalker544/libsvm-go"
+import "github.com/ewalker544/libsvm-go"
     
-```// Create a model object from the model file generated from training
-```model := libSvm.NewModelFromFile("a9a.model")  
+// Create a model object from the model file generated from training
+model := libSvm.NewModelFromFile("a9a.model")  
     
-```x := make(map[int]float64)
-```// Populate x with the test vector
+x := make(map[int]float64)
+// Populate x with the test vector
     
-```predictLabel := model.Predict(x)    // Predicts a float64 label given the test vector 
-    
+predictLabel := model.Predict(x)    // Predicts a float64 label given the test vector 
+```   
     
     
 
