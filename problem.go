@@ -45,8 +45,15 @@ func NewProblem(file string, param *Parameter) (*Problem, error) {
 	return prob, err
 }
 
-func NewEmptyProblem() *Problem {
-	return &Problem{l: 0, i: 0}
+func NewProblem2(y []float64, x []map[int]float64, param *Parameter) *Problem {
+	prob := &Problem{l: 0, i: 0}
+	for i := 0; i < len(x); i++ {
+		prob.Add(y[i], x[i])
+	}
+	if param.Gamma == 0 {
+		param.Gamma = prob.gamma()
+	}
+	return prob
 }
 
 func (problem *Problem) Read(file string, param *Parameter) error { // reads the problem from the specified file
@@ -177,7 +184,7 @@ func (problem *Problem) Add(y float64, c map[int]float64) {
  * Returns 0 if there are no vectors.
  * @return number of features
  */
-func (problem *Problem) NumFeatures() int {
+func (problem *Problem) numFeatures() int {
 	max_idx := 0
 	for _, n := range problem.xSpace {
 		if n.index > max_idx {
@@ -190,6 +197,11 @@ func (problem *Problem) NumFeatures() int {
 /**
  * Get a default value for Gamma, 1/num_features
  */
-func (problem *Problem) Gamma() float64 {
-	return 1.0 / float64(problem.NumFeatures())
+func (problem *Problem) gamma() float64 {
+	numFeatures := problem.numFeatures()
+	if numFeatures > 0 {
+		return 1.0 / float64(numFeatures)
+	} else {
+		return 0
+	}
 }
