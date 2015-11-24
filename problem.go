@@ -45,6 +45,10 @@ func NewProblem(file string, param *Parameter) (*Problem, error) {
 	return prob, err
 }
 
+func NewEmptyProblem() *Problem {
+	return &Problem{l: 0, i: 0}
+}
+
 func (problem *Problem) Read(file string, param *Parameter) error { // reads the problem from the specified file
 	f, err := os.Open(file)
 	if err != nil {
@@ -157,7 +161,7 @@ func (problem *Problem) ProblemSize() int {
 }
 
 /**
- *Adds a vector to the problem set
+ * Adds a vector to the problem set
  */
 func (problem *Problem) Add(y float64, c map[int]float64) {
 	problem.y = append(problem.y, y)
@@ -166,4 +170,26 @@ func (problem *Problem) Add(y float64, c map[int]float64) {
 		problem.xSpace = append(problem.xSpace, snode{index: index, value: value})
 	}
 	problem.xSpace = append(problem.xSpace, snode{index: -1})
+}
+
+/**
+ * Return the largest index out of all of the vectors which is assumed to be the number of features.
+ * Returns 0 if there are no vectors.
+ * @return number of features
+ */
+func (problem *Problem) NumFeatures() int {
+	max_idx := 0
+	for _, n := range problem.xSpace {
+		if n.index > max_idx {
+			max_idx = n.index
+		}
+	}
+	return max_idx
+}
+
+/**
+ * Get a default value for Gamma, 1/num_features
+ */
+func (problem *Problem) Gamma() float64 {
+	return 1.0 / float64(problem.NumFeatures())
 }
