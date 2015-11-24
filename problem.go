@@ -173,6 +173,7 @@ func (problem *Problem) ProblemSize() int {
 func (problem *Problem) Add(y float64, c map[int]float64) {
 	problem.y = append(problem.y, y)
 	problem.x = append(problem.x, len(problem.xSpace))
+	problem.l++
 	for index, value := range c {
 		problem.xSpace = append(problem.xSpace, snode{index: index, value: value})
 	}
