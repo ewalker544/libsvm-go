@@ -155,3 +155,15 @@ func (problem *Problem) GetLine() (y float64, x map[int]float64) {
 func (problem *Problem) ProblemSize() int {
 	return problem.l
 }
+
+/**
+ *Adds a vector to the problem set
+ */
+func (problem *Problem) Add(y float64, c map[int]float64) {
+	problem.y = append(problem.y, y)
+	problem.x = append(problem.x, len(problem.xSpace))
+	for index, value := range c {
+		problem.xSpace = append(problem.xSpace, snode{index: index, value: value})
+	}
+	problem.xSpace = append(problem.xSpace, snode{index: -1})
+}
