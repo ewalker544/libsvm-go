@@ -45,6 +45,17 @@ func NewProblem(file string, param *Parameter) (*Problem, error) {
 	return prob, err
 }
 
+func NewProblem2(y []float64, x []map[int]float64, param *Parameter) *Problem {
+	prob := &Problem{l: 0, i: 0}
+	for i := 0; i < len(x); i++ {
+		prob.Add(y[i], x[i])
+	}
+	if param.Gamma == 0 {
+		param.Gamma = prob.gamma()
+	}
+	return prob
+}
+
 func (problem *Problem) Read(file string, param *Parameter) error { // reads the problem from the specified file
 	f, err := os.Open(file)
 	if err != nil {
@@ -154,4 +165,44 @@ func (problem *Problem) GetLine() (y float64, x map[int]float64) {
  */
 func (problem *Problem) ProblemSize() int {
 	return problem.l
+}
+
+/**
+ * Adds a vector to the problem set
+ */
+func (problem *Problem) Add(y float64, c map[int]float64) {
+	problem.y = append(problem.y, y)
+	problem.x = append(problem.x, len(problem.xSpace))
+	problem.l++
+	for index, value := range c {
+		problem.xSpace = append(problem.xSpace, snode{index: index, value: value})
+	}
+	problem.xSpace = append(problem.xSpace, snode{index: -1})
+}
+
+/**
+ * Return the largest index out of all of the vectors which is assumed to be the number of features.
+ * Returns 0 if there are no vectors.
+ * @return number of features
+ */
+func (problem *Problem) numFeatures() int {
+	max_idx := 0
+	for _, n := range problem.xSpace {
+		if n.index > max_idx {
+			max_idx = n.index
+		}
+	}
+	return max_idx
+}
+
+/**
+ * Get a default value for Gamma, 1/num_features
+ */
+func (problem *Problem) gamma() float64 {
+	numFeatures := problem.numFeatures()
+	if numFeatures > 0 {
+		return 1.0 / float64(numFeatures)
+	} else {
+		return 0
+	}
 }
