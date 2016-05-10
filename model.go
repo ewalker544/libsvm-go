@@ -19,6 +19,7 @@
 package libSvm
 
 import (
+	"bufio"
 	"fmt"
 	"math"
 	"os"
@@ -43,10 +44,17 @@ func NewModel(param *Parameter) *Model {
 	return &Model{param: param}
 }
 
+func NewModelFromReader(reader *bufio.Reader) *Model {
+	param := NewParameter()
+	model := NewModel(param)
+	model.ReadModel(reader)
+	return model
+}
+
 func NewModelFromFile(file string) *Model {
 	param := NewParameter()
 	model := NewModel(param)
-	model.ReadModel(file)	
+	model.ReadModelFromFile(file)
 	return model
 }
 
@@ -355,4 +363,3 @@ func (model *Model) Train(prob *Problem) error {
 	}
 	return nil
 }
-
