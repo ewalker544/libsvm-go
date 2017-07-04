@@ -32,7 +32,7 @@ import (
    stored in the slice called target.
 */
 func CrossValidation(prob *Problem, param *Parameter, nrFold int) (target []float64) {
-	target, _ = CrossValidationWithAccuracies(prob, param, nrFold)
+	target, _ , _, _= CrossValidationWithAccuracies(prob, param, nrFold)
 	return
 }
 
@@ -44,11 +44,12 @@ func CrossValidation(prob *Problem, param *Parameter, nrFold int) (target []floa
    stored in the slice called target. Each fold accuracy is stored
    in the accuracies slice.
 */
-func CrossValidationWithAccuracies(prob *Problem, param *Parameter, nrFold int) (target, accuracies []float64) {
+func CrossValidationWithAccuracies(prob *Problem, param *Parameter, nrFold int) (target, accuracies []float64, all, TPs int) {
 	var l int = prob.l
 
 	target = make([]float64, l) // slice to return
 	accuracies = make([]float64, nrFold)
+	TPs = 0
 
 	if nrFold > l {
 		nrFold = l
@@ -173,6 +174,8 @@ func CrossValidationWithAccuracies(prob *Problem, param *Parameter, nrFold int) 
 			}
 		}
 
+		TPs += TP
+		all += end-begin
 		accuracies[i] = float64(TP) / float64(end-begin)
 	}
 
