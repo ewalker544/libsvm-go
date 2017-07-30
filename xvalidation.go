@@ -22,6 +22,7 @@ import (
 	"fmt"
 	"math/rand"
 	"time"
+	"strconv"
 )
 
 /**
@@ -44,14 +45,14 @@ func CrossValidation(prob *Problem, param *Parameter, nrFold int) (target []floa
    stored in the slice called target. Each fold accuracy is stored
    in the accuracies slice.
 */
-func CrossValidationWithAccuracies(prob *Problem, param *Parameter, nrFold int) (target, accuracies []float64, c map[float64](map[float64]int)) {
+func CrossValidationWithAccuracies(prob *Problem, param *Parameter, nrFold int) (target, accuracies []float64, c map[string](map[string]int)) {
 	var l int = prob.l
 
 	target = make([]float64, l) // slice to return
 	accuracies = make([]float64, nrFold)
 
 	// confusion matrix
-	c = make(map[float64](map[float64]int))
+	c = make(map[string](map[string]int))
 
 	if nrFold > l {
 		nrFold = l
@@ -161,17 +162,21 @@ func CrossValidationWithAccuracies(prob *Problem, param *Parameter, nrFold int) 
 				x := SnodeToMap(prob.xSpace[idx:])
 				target[perm[j]], _ = subModel.PredictProbability(x)
 
-				_, ok := c[prob.y[perm[j]]]
+				original := floatToString(prob.y[perm[j]])
+				predicted := floatToString(target[perm[j]])
+
+				_, ok := c[original]
 				if !ok {
-					c[prob.y[perm[j]]] = make(map[float64]int)
+					c[original] = make(map[string]int)
+					c[original][original] = 0
 				}
 
-				_, ok = c[prob.y[perm[j]]][target[perm[j]]]
+				_, ok = c[original][predicted]
 				if !ok {
-					c[prob.y[perm[j]]][target[perm[j]]] = 0
+					c[original][predicted] = 0
 				}
 
-				c[prob.y[perm[j]]][target[perm[j]]] = c[prob.y[perm[j]]][target[perm[j]]] + 1
+				c[original][predicted] = c[original][predicted] + 1
 
 				if prob.y[perm[j]] == target[perm[j]] {
 					TP++
@@ -184,17 +189,21 @@ func CrossValidationWithAccuracies(prob *Problem, param *Parameter, nrFold int) 
 				x := SnodeToMap(prob.xSpace[idx:])
 				target[perm[j]] = subModel.Predict(x)
 
-				_, ok := c[prob.y[perm[j]]]
+				original := floatToString(prob.y[perm[j]])
+				predicted := floatToString(target[perm[j]])
+
+				_, ok := c[original]
 				if !ok {
-					c[prob.y[perm[j]]] = make(map[float64]int)
+					c[original] = make(map[string]int)
+					c[original][original] = 0
 				}
 
-				_, ok = c[prob.y[perm[j]]][target[perm[j]]]
+				_, ok = c[original][predicted]
 				if !ok {
-					c[prob.y[perm[j]]][target[perm[j]]] = 0
+					c[original][predicted] = 0
 				}
 
-				c[prob.y[perm[j]]][target[perm[j]]] = c[prob.y[perm[j]]][target[perm[j]]] + 1
+				c[original][predicted] = c[original][predicted] + 1
 
 				if prob.y[perm[j]] == target[perm[j]] {
 					TP++
@@ -206,4 +215,9 @@ func CrossValidationWithAccuracies(prob *Problem, param *Parameter, nrFold int) 
 	}
 
 	return
+}
+
+func floatToString(input_num float64) string {
+	// to convert a float number to a string
+	return strconv.FormatFloat(input_num, 'f', 0, 64)
 }
