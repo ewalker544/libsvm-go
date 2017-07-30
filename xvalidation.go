@@ -32,7 +32,7 @@ import (
    stored in the slice called target.
 */
 func CrossValidation(prob *Problem, param *Parameter, nrFold int) (target []float64) {
-	target, _, _, _ = CrossValidationWithAccuracies(prob, param, nrFold)
+	target, _, _ = CrossValidationWithAccuracies(prob, param, nrFold)
 	return
 }
 
@@ -44,13 +44,14 @@ func CrossValidation(prob *Problem, param *Parameter, nrFold int) (target []floa
    stored in the slice called target. Each fold accuracy is stored
    in the accuracies slice.
 */
-func CrossValidationWithAccuracies(prob *Problem, param *Parameter, nrFold int) (target, accuracies []float64, all, TPs int) {
+func CrossValidationWithAccuracies(prob *Problem, param *Parameter, nrFold int) (target, accuracies []float64, c map[float64](map[float64]int)) {
 	var l int = prob.l
 
 	target = make([]float64, l) // slice to return
 	accuracies = make([]float64, nrFold)
-	TPs = 0
-	all = 0
+
+	// confusion matrix
+	c = make(map[float64](map[float64]int))
 
 	if nrFold > l {
 		nrFold = l
@@ -159,6 +160,19 @@ func CrossValidationWithAccuracies(prob *Problem, param *Parameter, nrFold int) 
 				idx := prob.x[perm[j]]
 				x := SnodeToMap(prob.xSpace[idx:])
 				target[perm[j]], _ = subModel.PredictProbability(x)
+
+				_, ok := c[prob.y[perm[j]]]
+				if !ok {
+					c[prob.y[perm[j]]] = make(map[float64]int)
+				}
+
+				_, ok = c[prob.y[perm[j]]][target[perm[j]]]
+				if !ok {
+					c[prob.y[perm[j]]][target[perm[j]]] = 0
+				}
+
+				c[prob.y[perm[j]]][target[perm[j]]] = c[prob.y[perm[j]]][target[perm[j]]] + 1
+
 				if prob.y[perm[j]] == target[perm[j]] {
 					TP++
 				}
@@ -169,14 +183,25 @@ func CrossValidationWithAccuracies(prob *Problem, param *Parameter, nrFold int) 
 				idx := prob.x[perm[j]]
 				x := SnodeToMap(prob.xSpace[idx:])
 				target[perm[j]] = subModel.Predict(x)
+
+				_, ok := c[prob.y[perm[j]]]
+				if !ok {
+					c[prob.y[perm[j]]] = make(map[float64]int)
+				}
+
+				_, ok = c[prob.y[perm[j]]][target[perm[j]]]
+				if !ok {
+					c[prob.y[perm[j]]][target[perm[j]]] = 0
+				}
+
+				c[prob.y[perm[j]]][target[perm[j]]] = c[prob.y[perm[j]]][target[perm[j]]] + 1
+
 				if prob.y[perm[j]] == target[perm[j]] {
 					TP++
 				}
 			}
 		}
 
-		TPs += TP
-		all += (end - begin)
 		accuracies[i] = float64(TP) / float64(end-begin)
 	}
 

@@ -109,7 +109,7 @@ func (solver *solver) solve() solution {
 	} else {
 		max_iter = 100 * solver.l
 	}
-	max_iter = maxi(10000000, max_iter)
+	max_iter = maxi(100000, max_iter)
 	var counter = mini(solver.l, 1000) + 1
 
 	for iter < max_iter {
