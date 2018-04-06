@@ -363,57 +363,44 @@ func (model *Model) DumpToString() (string, error) {
 		output = append(output, fmt.Sprintf("coef0 %.6g\n", model.param.Coef0))
 	}
 
-	var nrClass int = model.nrClass
-	output = append(output, fmt.Sprintf("nr_class %d\n", nrClass))
+	output = append(output, fmt.Sprintf("nr_class %d\n", model.nrClass))
 
-	var l int = model.l
-	output = append(output, fmt.Sprintf("total_sv %d\n", l))
+	output = append(output, fmt.Sprintf("total_sv %d\n", model.l))
 
-	total_models := nrClass * (nrClass - 1) / 2
-	if len(model.rho) > 0 {
-		output = append(output, "rho")
-		for i := 0; i < total_models; i++ {
-			output = append(output, fmt.Sprintf(" %.6g", model.rho[i]))
-		}
+	output = append(output, "rho")
+	for i := range model.rho {
+		output = append(output, fmt.Sprintf(" %.6g", model.rho[i]))
 	}
 	output = append(output, "\n")
 
-	if len(model.label) > 0 {
-		output = append(output, "label")
-		for i := 0; i < nrClass; i++ {
-			output = append(output, fmt.Sprintf(" %d", model.label[i]))
-		}
-		output = append(output, "\n")
+	output = append(output, "label")
+	for i := range model.label {
+		output = append(output, fmt.Sprintf(" %d", model.label[i]))
 	}
+	output = append(output, "\n")
 
-	if len(model.probA) > 0 {
-		output = append(output, "probA")
-		for i := 0; i < total_models; i++ {
-			output = append(output, fmt.Sprintf(" %.8g", model.probA[i]))
-		}
-		output = append(output, "\n")
+	output = append(output, "probA")
+	for i := range model.probA{
+		output = append(output, fmt.Sprintf(" %.8g", model.probA[i]))
 	}
+	output = append(output, "\n")
 
-	if len(model.probB) > 0 {
-		output = append(output, "probB")
-		for i := 0; i < total_models; i++ {
-			output = append(output, fmt.Sprintf(" %.8g", model.probB[i]))
-		}
-		output = append(output, "\n")
+	output = append(output, "probB")
+	for i := range model.probB {
+		output = append(output, fmt.Sprintf(" %.8g", model.probB[i]))
 	}
+	output = append(output, "\n")
 
-	if len(model.nSV) > 0 {
-		output = append(output, "nr_sv")
-		for i := 0; i < nrClass; i++ {
-			output = append(output, fmt.Sprintf(" %d", model.nSV[i]))
-		}
-		output = append(output, "\n")
+	output = append(output, "nr_sv")
+	for i := range model.nSV{
+		output = append(output, fmt.Sprintf(" %d", model.nSV[i]))
 	}
+	output = append(output, "\n")
 
 	output = append(output, "SV\n")
 
-	for i := 0; i < l; i++ {
-		for j := 0; j < nrClass-1; j++ {
+	for i := 0; i < model.l; i++ {
+		for j := 0; j < model.nrClass-1; j++ {
 			output = append(output, fmt.Sprintf("%.16g ", model.svCoef[j][i]))
 		}
 
