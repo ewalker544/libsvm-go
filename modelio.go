@@ -369,10 +369,12 @@ func (model *Model) DumpToString() (string, error) {
 	var l int = model.l
 	output = append(output, fmt.Sprintf("total_sv %d\n", l))
 
-	output = append(output, "rho")
 	total_models := nrClass * (nrClass - 1) / 2
-	for i := 0; i < total_models; i++ {
-		output = append(output, fmt.Sprintf(" %.6g", model.rho[i]))
+	if len(model.rho) > 0 {
+		output = append(output, "rho")
+		for i := 0; i < total_models; i++ {
+			output = append(output, fmt.Sprintf(" %.6g", model.rho[i]))
+		}
 	}
 	output = append(output, "\n")
 
