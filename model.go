@@ -43,6 +43,7 @@ func NewModel(param *Parameter) *Model {
 	return &Model{param: param}
 }
 
+// NewModelFromFile creates SVM model using the data in file
 func NewModelFromFile(file string) *Model {
 	param := NewParameter()
 	model := NewModel(param)
@@ -50,10 +51,11 @@ func NewModelFromFile(file string) *Model {
 	return model
 }
 
-func NewModelFromText(text string) *Model {
+// NewModelFromString creates SVM model using the data in string
+func NewModelFromString(str string) *Model {
 	param := NewParameter()
 	model := NewModel(param)
-	model.ReadModelFromText(text)
+	model.ReadModelFromString(str)
 	return model
 }
 

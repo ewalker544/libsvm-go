@@ -26,6 +26,7 @@ import (
 	"strings"
 )
 
+// Dump saves the model parameters into a text file
 func (model *Model) Dump(file string) error {
 	f, err := os.Create(file)
 	if err != nil {
@@ -274,6 +275,7 @@ func (model *Model) readHeader(reader *bufio.Reader) error {
 	return fmt.Errorf("Fail to completely read header")
 }
 
+// ReadModel reads the model parameters from a text file
 func (model *Model) ReadModel(file string) error {
 	f, err := os.Open(file)
 	if err != nil {
@@ -341,8 +343,8 @@ func (model *Model) ReadModel(file string) error {
 	return nil
 }
 
-
-func (model *Model) DumpText() (string, error) {
+// DumpToString saves the model parameters into a string
+func (model *Model) DumpToString() (string, error) {
 	var output []string
 
 	output = append(output, fmt.Sprintf("svm_type %s\n", svm_type_string[model.param.SvmType]))
@@ -426,22 +428,18 @@ func (model *Model) DumpText() (string, error) {
 			output = append(output, "\n")
 		}
 	}
-
-	strings.Join(output, "")
-
 	return strings.Join(output, ""), nil
 }
 
-
-func (model *Model) readHeaderText(text []string) (int, error) {
+func (model *Model) readHeaderString(str []string) (int, error) {
 
 	var lineNumber int
 
-	for l, line := range text {
+	for l := range str {
 		var i = 0
 		var err error
 
-		tokens := strings.Fields(line)
+		tokens := strings.Fields(str[l])
 		lineNumber = l
 
 		switch tokens[0] {
@@ -546,7 +544,7 @@ func (model *Model) readHeaderText(text []string) (int, error) {
 
 			total_class_comparisons := model.nrClass * (model.nrClass - 1) / 2
 			if total_class_comparisons != len(tokens)-1 {
-				return lineNumber, fmt.Errorf("Number of probB %d does not mactch the required number %d\n", len(tokens)-1, total_class_comparisons)
+				return lineNumber, fmt.Errorf("Number of probB %d does not match the required number %d\n", len(tokens)-1, total_class_comparisons)
 			}
 
 			model.probB = make([]float64, total_class_comparisons)
@@ -572,7 +570,7 @@ func (model *Model) readHeaderText(text []string) (int, error) {
 		case "SV":
 			return lineNumber, nil // done reading the header!
 		default:
-			return lineNumber, fmt.Errorf("unknown text in model file: [%s]\n", tokens[0])
+			return lineNumber, fmt.Errorf("unknown str in model file: [%s]\n", tokens[0])
 
 		}
 	}
@@ -580,11 +578,12 @@ func (model *Model) readHeaderText(text []string) (int, error) {
 	return lineNumber, fmt.Errorf("fail to completely read header")
 }
 
-func (model *Model) ReadModelFromText(s string) error {
+// ReadModelFromString reads the model parameters from a data string
+func (model *Model) ReadModelFromString(str string) error {
 
-	text:= strings.Split(s, "\n")
+	text:= strings.Split(str, "\n")
 
-	lineNumber, err := model.readHeaderText(text)
+	lineNumber, err := model.readHeaderString(text)
 	if  err != nil {
 		return err
 	}
