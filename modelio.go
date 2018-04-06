@@ -367,7 +367,7 @@ func (model *Model) DumpToString() (string, error) {
 
 	output = append(output, fmt.Sprintf("total_sv %d\n", model.l))
 
-	if len(model.rho)>0{
+	if len(model.rho) > 0 {
 		output = append(output, "rho")
 		for i := range model.rho {
 			output = append(output, fmt.Sprintf(" %.6g", model.rho[i]))
@@ -375,22 +375,22 @@ func (model *Model) DumpToString() (string, error) {
 		output = append(output, "\n")
 	}
 
-	if len(model.label)>0{
+	if len(model.label) > 0 {
 		output = append(output, "label")
 		for i := range model.label {
 			output = append(output, fmt.Sprintf(" %d", model.label[i]))
 		}
 		output = append(output, "\n")
 	}
-	if len(model.probA)>0{
+	if len(model.probA) > 0 {
 		output = append(output, "probA")
-		for i := range model.probA{
+		for i := range model.probA {
 			output = append(output, fmt.Sprintf(" %.8g", model.probA[i]))
 		}
 		output = append(output, "\n")
 	}
 
-	if len(model.probB)>0{
+	if len(model.probB) > 0 {
 		output = append(output, "probB")
 		for i := range model.probB {
 			output = append(output, fmt.Sprintf(" %.8g", model.probB[i]))
@@ -398,31 +398,34 @@ func (model *Model) DumpToString() (string, error) {
 		output = append(output, "\n")
 	}
 
-	if len(model.nSV)>0{
+	if len(model.nSV) > 0 {
 		output = append(output, "nr_sv")
-		for i := range model.nSV{
+		for i := range model.nSV {
 			output = append(output, fmt.Sprintf(" %d", model.nSV[i]))
 		}
 		output = append(output, "\n")
 	}
 
 	output = append(output, "SV\n")
-	for i := 0; i < model.l; i++ {
-		for j := 0; j < model.nrClass-1; j++ {
-			output = append(output, fmt.Sprintf("%.16g ", model.svCoef[j][i]))
-		}
-
-		i_idx := model.sV[i]
-		if model.param.KernelType == PRECOMPUTED {
-			output = append(output, fmt.Sprintf("0:%d ", model.svSpace[i_idx]))
-		} else {
-			for model.svSpace[i_idx].index != -1 {
-				index := model.svSpace[i_idx].index
-				value := model.svSpace[i_idx].value
-				output = append(output, fmt.Sprintf("%d:%.8g ", index, value))
-				i_idx++
+	if len(model.svCoef)==model.l {
+		for i := 0; i < model.l; i++ {
+			if len(model.svCoef[i]) == model.nrClass-1{
+				for j := 0; j < model.nrClass-1; j++{
+					output = append(output, fmt.Sprintf("%.16g ", model.svCoef[j][i]))
+				}
+				i_idx := model.sV[i]
+				if model.param.KernelType == PRECOMPUTED{
+					output = append(output, fmt.Sprintf("0:%d ", model.svSpace[i_idx]))
+				} else{
+					for model.svSpace[i_idx].index != -1{
+						index := model.svSpace[i_idx].index
+						value := model.svSpace[i_idx].value
+						output = append(output, fmt.Sprintf("%d:%.8g ", index, value))
+						i_idx++
+					}
+				output = append(output, "\n")
+				}
 			}
-			output = append(output, "\n")
 		}
 	}
 	return strings.Join(output, ""), nil
