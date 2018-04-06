@@ -407,9 +407,9 @@ func (model *Model) DumpToString() (string, error) {
 	}
 
 	output = append(output, "SV\n")
-	if len(model.svCoef)==model.l {
+	if len(model.svCoef)==model.nrClass-1 {
 		for i := 0; i < model.l; i++ {
-			if len(model.svCoef[i]) == model.nrClass-1{
+			if len(model.svCoef[i]) == model.l{
 				for j := 0; j < model.nrClass-1; j++{
 					output = append(output, fmt.Sprintf("%.16g ", model.svCoef[j][i]))
 				}
