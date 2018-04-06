@@ -367,38 +367,46 @@ func (model *Model) DumpToString() (string, error) {
 
 	output = append(output, fmt.Sprintf("total_sv %d\n", model.l))
 
-	output = append(output, "rho")
-	for i := range model.rho {
-		output = append(output, fmt.Sprintf(" %.6g", model.rho[i]))
+	if len(model.rho)>0{
+		output = append(output, "rho")
+		for i := range model.rho {
+			output = append(output, fmt.Sprintf(" %.6g", model.rho[i]))
+		}
+		output = append(output, "\n")
 	}
-	output = append(output, "\n")
 
-	output = append(output, "label")
-	for i := range model.label {
-		output = append(output, fmt.Sprintf(" %d", model.label[i]))
+	if len(model.label)>0{
+		output = append(output, "label")
+		for i := range model.label {
+			output = append(output, fmt.Sprintf(" %d", model.label[i]))
+		}
+		output = append(output, "\n")
 	}
-	output = append(output, "\n")
+	if len(model.probA)>0{
+		output = append(output, "probA")
+		for i := range model.probA{
+			output = append(output, fmt.Sprintf(" %.8g", model.probA[i]))
+		}
+		output = append(output, "\n")
+	}
 
-	output = append(output, "probA")
-	for i := range model.probA{
-		output = append(output, fmt.Sprintf(" %.8g", model.probA[i]))
+	if len(model.probB)>0{
+		output = append(output, "probB")
+		for i := range model.probB {
+			output = append(output, fmt.Sprintf(" %.8g", model.probB[i]))
+		}
+		output = append(output, "\n")
 	}
-	output = append(output, "\n")
 
-	output = append(output, "probB")
-	for i := range model.probB {
-		output = append(output, fmt.Sprintf(" %.8g", model.probB[i]))
+	if len(model.nSV)>0{
+		output = append(output, "nr_sv")
+		for i := range model.nSV{
+			output = append(output, fmt.Sprintf(" %d", model.nSV[i]))
+		}
+		output = append(output, "\n")
 	}
-	output = append(output, "\n")
-
-	output = append(output, "nr_sv")
-	for i := range model.nSV{
-		output = append(output, fmt.Sprintf(" %d", model.nSV[i]))
-	}
-	output = append(output, "\n")
 
 	output = append(output, "SV\n")
-
 	for i := 0; i < model.l; i++ {
 		for j := 0; j < model.nrClass-1; j++ {
 			output = append(output, fmt.Sprintf("%.16g ", model.svCoef[j][i]))
