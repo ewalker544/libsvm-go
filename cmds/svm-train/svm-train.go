@@ -19,7 +19,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/ewalker544/libsvm-go"
+	"github.com/nevisQ/libsvm-go"
 	"os"
 )
 
