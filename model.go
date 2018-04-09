@@ -275,9 +275,9 @@ func (model *Model) classification(prob *Problem) {
 		nzStart[i] = nzStart[i-1] + nz_count[i-1]
 	}
 
-	model.svCoef = make([][]float64, nrClass-1)
+	model.svCoef = make([][]float64, totalSV)
 	for i := 0; i < nrClass-1; i++ {
-		model.svCoef[i] = make([]float64, totalSV)
+		model.svCoef[i] = make([]float64, nrClass-1)
 	}
 
 	p = 0
@@ -297,14 +297,14 @@ func (model *Model) classification(prob *Problem) {
 			q := nzStart[i]
 			for k := 0; k < ci; k++ {
 				if nonzero[si+k] {
-					model.svCoef[j-1][q] = decisions[p].alpha[k]
+					model.svCoef[q][j-1] = decisions[p].alpha[k]
 					q++
 				}
 			}
 			q = nzStart[j]
 			for k := 0; k < cj; k++ {
 				if nonzero[sj+k] {
-					model.svCoef[i][q] = decisions[p].alpha[ci+k]
+					model.svCoef[q][i] = decisions[p].alpha[ci+k]
 					q++
 				}
 			}
@@ -337,15 +337,17 @@ func (model *Model) regressionOneClass(prob *Problem) {
 		model.l = nSV
 		model.svSpace = prob.xSpace
 		model.sV = make([]int, nSV)
-		model.svCoef = make([][]float64, 1)
-		model.svCoef[0] = make([]float64, nSV)
+		model.svCoef = make([][]float64, nSV)
+		for i := 0; i < nSV; i++ {
+			model.svCoef[i] = make([]float64, 1)
+		}
 		model.svIndices = make([]int, nSV)
 
 		var j int = 0
 		for i := 0; i < prob.l; i++ {
 			if math.Abs(decision_result.alpha[i]) > 0 {
 				model.sV[j] = prob.x[i]
-				model.svCoef[0][j] = decision_result.alpha[i]
+				model.svCoef[j][0] = decision_result.alpha[i]
 				model.svIndices[j] = i + 1
 				j++
 			}
