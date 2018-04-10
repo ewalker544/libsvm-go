@@ -407,23 +407,23 @@ func (model *Model) DumpToString() (string, error) {
 	}
 
 	output = append(output, "SV\n")
-	if len(model.svCoef)== model.l {
+	if len(model.svCoef) == model.l {
 		for i := 0; i < model.l; i++ {
-			if len(model.svCoef[i]) == model.nrClass-1{
-				for j := 0; j < model.nrClass-1; j++{
+			if len(model.svCoef[i]) == model.nrClass-1 {
+				for j := 0; j < model.nrClass-1; j++ {
 					output = append(output, fmt.Sprintf("%.16g ", model.svCoef[i][j]))
 				}
 				i_idx := model.sV[i]
-				if model.param.KernelType == PRECOMPUTED{
+				if model.param.KernelType == PRECOMPUTED {
 					output = append(output, fmt.Sprintf("0:%d ", model.svSpace[i_idx]))
-				} else{
-					for model.svSpace[i_idx].index != -1{
+				} else {
+					for model.svSpace[i_idx].index != -1 {
 						index := model.svSpace[i_idx].index
 						value := model.svSpace[i_idx].value
 						output = append(output, fmt.Sprintf("%d:%.8g ", index, value))
 						i_idx++
 					}
-				output = append(output, "\n")
+					output = append(output, "\n")
 				}
 			}
 		}
@@ -453,7 +453,7 @@ func (model *Model) readHeaderString(str []string) (int, error) {
 			}
 
 			if i == len(svm_type_string) {
-				return  lineNumber, fmt.Errorf("fail to parse svm model %s\n", tokens[1])
+				return lineNumber, fmt.Errorf("fail to parse svm model %s\n", tokens[1])
 			}
 
 		case "kernel_type":
@@ -581,22 +581,22 @@ func (model *Model) readHeaderString(str []string) (int, error) {
 // ReadModelFromString reads the model parameters from a data string
 func (model *Model) ReadModelFromString(str string) error {
 
-	text:= strings.Split(str, "\n")
+	text := strings.Split(str, "\n")
 
 	lineNumber, err := model.readHeaderString(text)
-	if  err != nil {
+	if err != nil {
 		return err
 	}
 
 	model.svCoef = make([][]float64, model.l)
 	for i := 0; i < model.l; i++ {
-		model.svCoef[i] = make([]float64, model.nrClass - 1)
+		model.svCoef[i] = make([]float64, model.nrClass-1)
 	}
 
 	model.sV = make([]int, model.l)
 	var sVInd = 0
-	for i:=lineNumber+1; i<len(text); i++{
-		line:=text[i]
+	for i := lineNumber + 1; i < len(text); i++ {
+		line := text[i]
 
 		tokens := strings.Fields(line) // get all the word tokens (seperated by white spaces)
 		if len(tokens) < 2 {           // there should be at least 2 fields -- label + SV
@@ -610,7 +610,7 @@ func (model *Model) ReadModelFromString(str string) error {
 
 		var k = 0
 		for _, token := range tokens {
-			if k < model.nrClass - 1 {
+			if k < model.nrClass-1 {
 				model.svCoef[sVInd][k], err = strconv.ParseFloat(token, 64)
 				k++
 			} else {
