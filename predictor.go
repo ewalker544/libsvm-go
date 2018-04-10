@@ -100,9 +100,12 @@ func (model Model) PredictValues(x map[int]float64) (returnValue float64, decisi
 
 				var ci int = model.nSV[i]
 				var cj int = model.nSV[j]
-
-				coef1 := model.svCoef[j-1]
-				coef2 := model.svCoef[i]
+				coef1:= make([]float64,len(model.svCoef))
+				coef2:= make([]float64,len(model.svCoef))
+				for k:=0;k<len(model.svCoef);k++{
+					coef1[k] = model.svCoef[k][j-1]
+					coef2[k] = model.svCoef[k][i]
+				}
 				for k := 0; k < ci; k++ {
 					sum += coef1[si+k] * kvalue[si+k]
 				}

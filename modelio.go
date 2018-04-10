@@ -588,9 +588,9 @@ func (model *Model) ReadModelFromString(str string) error {
 		return err
 	}
 
-	model.svCoef = make([][]float64, model.nrClass - 1)
-	for i := 0; i < model.nrClass - 1; i++ {
-		model.svCoef[i] = make([]float64, model.l)
+	model.svCoef = make([][]float64, model.l)
+	for i := 0; i < model.l; i++ {
+		model.svCoef[i] = make([]float64, model.nrClass - 1)
 	}
 
 	model.sV = make([]int, model.l)

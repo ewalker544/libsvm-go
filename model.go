@@ -276,7 +276,7 @@ func (model *Model) classification(prob *Problem) {
 	}
 
 	model.svCoef = make([][]float64, totalSV)
-	for i := 0; i < nrClass-1; i++ {
+	for i := 0; i < totalSV; i++ {
 		model.svCoef[i] = make([]float64, nrClass-1)
 	}
 
