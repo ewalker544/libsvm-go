@@ -37,7 +37,6 @@ func (model *Model) Dump(file string) error {
 
 	var output []string
 
-	//svm_type_string := [5]string{"c_svc", "nu_svc", "one_class", "epsilon_svr", "nu_svr"}
 	output = append(output, fmt.Sprintf("svm_type %s\n", svm_type_string[model.param.SvmType]))
 
 	output = append(output, fmt.Sprintf("kernel_type %s\n", kernel_type_string[model.param.KernelType]))
@@ -54,30 +53,28 @@ func (model *Model) Dump(file string) error {
 		output = append(output, fmt.Sprintf("coef0 %.6g\n", model.param.Coef0))
 	}
 
-	var nrClass int = model.nrClass
-	output = append(output, fmt.Sprintf("nr_class %d\n", nrClass))
+	output = append(output, fmt.Sprintf("nr_class %d\n", model.nrClass))
 
-	var l int = model.l
-	output = append(output, fmt.Sprintf("total_sv %d\n", l))
+	output = append(output, fmt.Sprintf("total_sv %d\n", model.l))
 
-	output = append(output, "rho")
-	total_models := nrClass * (nrClass - 1) / 2
-	for i := 0; i < total_models; i++ {
-		output = append(output, fmt.Sprintf(" %.6g", model.rho[i]))
-	}
-	output = append(output, "\n")
-
-	if len(model.label) > 0 {
-		output = append(output, "label")
-		for i := 0; i < nrClass; i++ {
-			output = append(output, fmt.Sprintf(" %d", model.label[i]))
+	if len(model.rho) > 0 {
+		output = append(output, "rho")
+		for i := range model.rho {
+			output = append(output, fmt.Sprintf(" %.6g", model.rho[i]))
 		}
 		output = append(output, "\n")
 	}
 
+	if len(model.label) > 0 {
+		output = append(output, "label")
+		for i := range model.label {
+			output = append(output, fmt.Sprintf(" %d", model.label[i]))
+		}
+		output = append(output, "\n")
+	}
 	if len(model.probA) > 0 {
 		output = append(output, "probA")
-		for i := 0; i < total_models; i++ {
+		for i := range model.probA {
 			output = append(output, fmt.Sprintf(" %.8g", model.probA[i]))
 		}
 		output = append(output, "\n")
@@ -85,7 +82,7 @@ func (model *Model) Dump(file string) error {
 
 	if len(model.probB) > 0 {
 		output = append(output, "probB")
-		for i := 0; i < total_models; i++ {
+		for i := range model.probB {
 			output = append(output, fmt.Sprintf(" %.8g", model.probB[i]))
 		}
 		output = append(output, "\n")
@@ -93,33 +90,34 @@ func (model *Model) Dump(file string) error {
 
 	if len(model.nSV) > 0 {
 		output = append(output, "nr_sv")
-		for i := 0; i < nrClass; i++ {
+		for i := range model.nSV {
 			output = append(output, fmt.Sprintf(" %d", model.nSV[i]))
 		}
 		output = append(output, "\n")
 	}
 
 	output = append(output, "SV\n")
-
-	for i := 0; i < l; i++ {
-		for j := 0; j < nrClass-1; j++ {
-			output = append(output, fmt.Sprintf("%.16g ", model.svCoef[i][j]))
-		}
-
-		i_idx := model.sV[i]
-		if model.param.KernelType == PRECOMPUTED {
-			output = append(output, fmt.Sprintf("0:%d ", model.svSpace[i_idx]))
-		} else {
-			for model.svSpace[i_idx].index != -1 {
-				index := model.svSpace[i_idx].index
-				value := model.svSpace[i_idx].value
-				output = append(output, fmt.Sprintf("%d:%.8g ", index, value))
-				i_idx++
+	if len(model.svCoef) == model.l {
+		for i := 0; i < model.l; i++ {
+			if len(model.svCoef[i]) == model.nrClass-1 {
+				for j := 0; j < model.nrClass-1; j++ {
+					output = append(output, fmt.Sprintf("%.16g ", model.svCoef[i][j]))
+				}
+				i_idx := model.sV[i]
+				if model.param.KernelType == PRECOMPUTED {
+					output = append(output, fmt.Sprintf("0:%d ", model.svSpace[i_idx]))
+				} else {
+					for model.svSpace[i_idx].index != -1 {
+						index := model.svSpace[i_idx].index
+						value := model.svSpace[i_idx].value
+						output = append(output, fmt.Sprintf("%d:%.8g ", index, value))
+						i_idx++
+					}
+					output = append(output, "\n")
+				}
 			}
-			output = append(output, "\n")
 		}
 	}
-
 	f.WriteString(strings.Join(output, ""))
 
 	return nil
@@ -290,15 +288,13 @@ func (model *Model) ReadModel(file string) error {
 		return err
 	}
 
-	var l int = model.l           // read l from header
-	var m int = model.nrClass - 1 // read nrClass from header
-	model.svCoef = make([][]float64, m)
-	for i := 0; i < m; i++ {
-		model.svCoef[i] = make([]float64, l)
+	model.svCoef = make([][]float64, model.l)
+	for i := 0; i < model.l; i++ {
+		model.svCoef[i] = make([]float64, model.nrClass-1)
 	}
 
-	model.sV = make([]int, l)
-	var i int = 0
+	model.sV = make([]int, model.l)
+	var sVInd = 0
 	for {
 		line, err := readline(reader) // read a line
 		if err != nil {
@@ -309,16 +305,16 @@ func (model *Model) ReadModel(file string) error {
 		if len(tokens) < 2 {           // there should be at least 2 fields -- label + SV
 			continue
 		}
-		if i >= l {
-			return fmt.Errorf("Error in reading support vectors.  i=%d and l=%d\n", i, l)
+		if sVInd >= model.l {
+			return fmt.Errorf("Error in reading support vectors.  sVInd=%d and l=%d\n", sVInd, model.l)
 		}
 
-		model.sV[i] = len(model.svSpace) // starting index into svSpace for this SV
+		model.sV[sVInd] = len(model.svSpace) // starting index into svSpace for this SV
 
-		var k int = 0
+		var k = 0
 		for _, token := range tokens {
-			if k < m {
-				model.svCoef[i][k], err = strconv.ParseFloat(token, 64)
+			if k < model.nrClass-1 {
+				model.svCoef[sVInd][k], err = strconv.ParseFloat(token, 64)
 				k++
 			} else {
 				node := strings.Split(token, ":")
@@ -337,7 +333,7 @@ func (model *Model) ReadModel(file string) error {
 			}
 		}
 		model.svSpace = append(model.svSpace, snode{index: -1})
-		i++
+		sVInd++
 	}
 
 	return nil
