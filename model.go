@@ -44,19 +44,25 @@ func NewModel(param *Parameter) *Model {
 }
 
 // NewModelFromFile creates SVM model using the data in file
-func NewModelFromFile(file string) *Model {
+func NewModelFromFile(file string) (*Model, error) {
 	param := NewParameter()
 	model := NewModel(param)
-	model.ReadModel(file)	
-	return model
+	err := model.ReadModel(file)
+	if err != nil {
+		return nil, err
+	}
+	return model, nil
 }
 
 // NewModelFromString creates SVM model using the data in string
-func NewModelFromString(str string) *Model {
+func NewModelFromString(str string) (*Model, error) {
 	param := NewParameter()
 	model := NewModel(param)
-	model.ReadModelFromString(str)
-	return model
+	err := model.ReadModelFromString(str)
+	if err != nil {
+		return nil, err
+	}
+	return model, nil
 }
 
 func (model Model) NrClass() int {
@@ -366,4 +372,3 @@ func (model *Model) Train(prob *Problem) error {
 	}
 	return nil
 }
-
