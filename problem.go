@@ -37,7 +37,6 @@ type Problem struct {
 	x      []int     // starting indices in xSpace defining SVs
 	xSpace []snode   // SV coeffs
 	i      int       // counter for iterator
-	param  *Parameter
 }
 
 // Struct for training
@@ -66,27 +65,26 @@ func NewTrainData(labels []float64, values []map[int]float64) *TrainData {
 
 // Create initial problem object
 // when we can start add row instances
-func InitProblem(param *Parameter) *Problem {
+func InitProblem() *Problem {
 	return &Problem{
 		l:      0,
 		y:      nil,
 		x:      nil,
 		xSpace: nil,
 		i:      0,
-		param:  param,
 	}
 }
 
-func (problem *Problem) FitProblem(train *TrainData) error {
+func (problem *Problem) FitProblem(train *TrainData, param *Parameter) error {
 	if train.lY != train.lX {
 		return fmt.Errorf("Train data is not have equal params for futures and classes labels len: %d <> values len: %d\n", train.lY, train.lX)
 	}
 	var max_idx int = 0
 	problem.l = train.lY
 
-	var xIndex = make(map[int]int, 0)
 	for problem.Begin(); !problem.Done(); problem.Next() {
 		problem.x = append(problem.x, len(problem.xSpace))
+
 		label := train.Y[problem.i]
 		problem.y = append(problem.y, label)
 
@@ -95,19 +93,13 @@ func (problem *Problem) FitProblem(train *TrainData) error {
 			if index > max_idx {
 				max_idx = index
 			}
-
-			if xIndex[index] != index {
-				xIndex[index] = index
-
-				//problem.x = append(problem.x, index)
-			}
 		}
 
 		problem.xSpace = append(problem.xSpace, snode{index: -1})
 	}
 
-	if problem.param.Gamma == 0 && max_idx > 0 {
-		problem.param.Gamma = 1.0 / float64(max_idx)
+	if param.Gamma == 0 && max_idx > 0 {
+		param.Gamma = 1.0 / float64(max_idx)
 	}
 
 	fmt.Println("Problem l", problem.l)
