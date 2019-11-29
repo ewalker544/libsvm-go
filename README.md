@@ -38,6 +38,42 @@ model.Train(problem)                // Train the model from the problem specific
     
 model.Dump("a9a.model")             // Dump the model into a user-specified file
 ```    
+
+### Manual create problem with train data
+```go
+// As example if you want to train your model
+// by classification you can do next
+import (
+    ...
+    libSvm "github.com/killer-djon/libsvm-go"
+)
+
+param := libSvm.NewParameter()
+param.SvmType = libSvm.NU_SVC
+param.Eps = 1e-4
+param.Probability = true
+
+// labels []float64 // slice of all labels 
+// values []map[int]float64 // slice is equal to nr labels 
+// and contains mapping values with index:float64_value by this index
+// as example:
+// labels := []float64{1, 4, 6, 8} - slice of random labels
+// nrLabels in this case is 4
+// values := []map[int]float64{} by eny values
+
+// you can create train data with labels and its values
+trainData := libSvm.NewTrainData(labels, values)
+// Create new clean problem
+prob := libSvm.InitProblem()
+// After this you can fit with train data your problem
+err := prob.FitProblem(trainData, param)
+
+// After this you can start training model
+model := libSvm.NewModel(param)
+model.Train(prob)
+model.Dump("train.model")
+
+```
     
 ### Predicting
 ```go
