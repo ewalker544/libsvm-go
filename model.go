@@ -54,6 +54,10 @@ func (model Model) NrClass() int {
 	return model.nrClass
 }
 
+func (model Model) Labels() []int {
+	return model.label
+}
+
 func groupClasses(prob *Problem) (nrClass int, label []int, start []int, count []int, perm []int) {
 	var l int = prob.l
 
